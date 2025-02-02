@@ -277,7 +277,7 @@ class ChatAgent(BaseAgent):
             info = self.get_info(
                 None,
                 None,
-                ["max_tokens_exceeded_by_camel"],
+                ["max_completion_tokens_exceeded_by_camel"],
                 num_tokens,
             )
 

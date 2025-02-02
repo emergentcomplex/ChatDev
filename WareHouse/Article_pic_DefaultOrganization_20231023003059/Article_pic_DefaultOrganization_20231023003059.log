@@ -23,7 +23,7 @@ ChatEnvConfig.gui_design: True
 
 
 **ChatGPTConfig**:
-ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -4962,19 +4962,27 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 1
 [2023-23-10 01:16:44 INFO] flask app.py did not start for online log
 [2023-23-10 01:16:47 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+
 
 
 [2023-23-10 01:16:49 INFO] flask app.py did not start for online log
 [2023-23-10 01:16:52 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+
 
 
 [2023-23-10 01:16:54 INFO] flask app.py did not start for online log
@@ -5102,10 +5110,14 @@ This page displays the processed article in markdown format.
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+"Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+
 "
 According to my test reports, please locate and summarize the bugs that cause the problem.
 
@@ -5298,10 +5310,14 @@ This page displays the processed article in markdown format.
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+"Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+ImportError: cannot import name 'ArticleProcessor' from 'article_processor' (D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py)
+
 "
 Error Summary of Test Reports:
 "Based on the test reports, the bug causing the problem is an import error in the `main.py` file. It is unable to import the `ArticleProcessor` class from the `article_processor` module.
@@ -5479,23 +5495,35 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 2
 [2023-23-10 01:18:08 INFO] flask app.py did not start for online log
 [2023-23-10 01:18:11 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
-    from image_finder import ImageFinder
-ModuleNotFoundError: No module named 'image_finder'
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
+
+    from image_finder import ImageFinder
+
+ModuleNotFoundError: No module named 'image_finder'
+
 
 
 [2023-23-10 01:18:13 INFO] flask app.py did not start for online log
 [2023-23-10 01:18:16 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
-    from image_finder import ImageFinder
-ModuleNotFoundError: No module named 'image_finder'
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
+
+    from image_finder import ImageFinder
+
+ModuleNotFoundError: No module named 'image_finder'
+
 
 
 [2023-23-10 01:18:18 INFO] flask app.py did not start for online log
@@ -5505,12 +5533,18 @@ ModuleNotFoundError: No module named 'image_finder'
 
 [2023-23-10 01:18:33 INFO] flask app.py did not start for online log
 [2023-23-10 01:18:33 INFO] Software Test Engineer found ModuleNotFoundError:
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
-    from image_finder import ImageFinder
-ModuleNotFoundError: No module named 'image_finder'
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
+
+    from image_finder import ImageFinder
+
+ModuleNotFoundError: No module named 'image_finder'
+
 
 
 
@@ -5666,12 +5700,18 @@ This page displays the processed article in markdown format.
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
-    from article_processor import ArticleProcessor
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
-    from image_finder import ImageFinder
-ModuleNotFoundError: No module named 'image_finder'
+"Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 5, in <module>
+
+    from article_processor import ArticleProcessor
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\article_processor.py", line 5, in <module>
+
+    from image_finder import ImageFinder
+
+ModuleNotFoundError: No module named 'image_finder'
+
 "
 Error Summary of Test Reports:
 "nothing need to do"
@@ -5829,41 +5869,71 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 3
 [2023-23-10 01:19:22 INFO] flask app.py did not start for online log
 [2023-23-10 01:19:25 INFO] **[Test Reports]**:
 
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
-    app.run(debug=True)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
-    run_simple(t.cast(str, host), port, self, **options)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
-    run_with_reloader(
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
-    reloader = reloader_loops[reloader_type](
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
-    from watchdog.events import EVENT_TYPE_OPENED
-ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+
+ * Running on http://127.0.0.1:5000
+
+Press CTRL+C to quit
+
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
+
+    app.run(debug=True)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
+
+    run_simple(t.cast(str, host), port, self, **options)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
+
+    run_with_reloader(
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
+
+    reloader = reloader_loops[reloader_type](
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
+
+    from watchdog.events import EVENT_TYPE_OPENED
+
+ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+
 
 
 [2023-23-10 01:19:27 INFO] flask app.py did not start for online log
 [2023-23-10 01:19:30 INFO] **[Test Reports]**:
 
-WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
-    app.run(debug=True)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
-    run_simple(t.cast(str, host), port, self, **options)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
-    run_with_reloader(
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
-    reloader = reloader_loops[reloader_type](
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
-    from watchdog.events import EVENT_TYPE_OPENED
-ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+
+ * Running on http://127.0.0.1:5000
+
+Press CTRL+C to quit
+
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
+
+    app.run(debug=True)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
+
+    run_simple(t.cast(str, host), port, self, **options)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
+
+    run_with_reloader(
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
+
+    reloader = reloader_loops[reloader_type](
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
+
+    from watchdog.events import EVENT_TYPE_OPENED
+
+ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+
 
 
 [2023-23-10 01:19:32 INFO] flask app.py did not start for online log
@@ -6024,21 +6094,36 @@ class ImageFinder:
 
 "
 Test Reports of Source Codes:
-"WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
-    app.run(debug=True)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
-    run_simple(t.cast(str, host), port, self, **options)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
-    run_with_reloader(
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
-    reloader = reloader_loops[reloader_type](
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
-    from watchdog.events import EVENT_TYPE_OPENED
-ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+"WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+
+ * Running on http://127.0.0.1:5000
+
+Press CTRL+C to quit
+
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
+
+    app.run(debug=True)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
+
+    run_simple(t.cast(str, host), port, self, **options)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
+
+    run_with_reloader(
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
+
+    reloader = reloader_loops[reloader_type](
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
+
+    from watchdog.events import EVENT_TYPE_OPENED
+
+ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+
 "
 According to my test reports, please locate and summarize the bugs that cause the problem.
 
@@ -6246,21 +6331,36 @@ class ImageFinder:
 
 "
 Test Reports of Source Codes:
-"WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
- * Running on http://127.0.0.1:5000
-Press CTRL+C to quit
-Traceback (most recent call last):
-  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
-    app.run(debug=True)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
-    run_simple(t.cast(str, host), port, self, **options)
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
-    run_with_reloader(
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
-    reloader = reloader_loops[reloader_type](
-  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
-    from watchdog.events import EVENT_TYPE_OPENED
-ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+"WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+
+ * Running on http://127.0.0.1:5000
+
+Press CTRL+C to quit
+
+Traceback (most recent call last):
+
+  File "D:\learnChatDev\MBChatDev\ChatDev\WareHouse\Article_pic_DefaultOrganization_20231023003059\main.py", line 16, in <module>
+
+    app.run(debug=True)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\flask\app.py", line 889, in run
+
+    run_simple(t.cast(str, host), port, self, **options)
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\serving.py", line 1097, in run_simple
+
+    run_with_reloader(
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 440, in run_with_reloader
+
+    reloader = reloader_loops[reloader_type](
+
+  File "C:\Users\20143\AppData\Roaming\Python\Python39\site-packages\werkzeug\_reloader.py", line 315, in __init__
+
+    from watchdog.events import EVENT_TYPE_OPENED
+
+ImportError: cannot import name 'EVENT_TYPE_OPENED' from 'watchdog.events' (D:\anaconda\lib\site-packages\watchdog\events.py)
+
 "
 Error Summary of Test Reports:
 "Based on the test reports, the bug causing the problem is an import error in the `main.py` file. The error message states that it cannot import the name `EVENT_TYPE_OPENED` from the `watchdog.events` module. This error is occurring because the `watchdog` library is not installed or is not compatible with the current environment.

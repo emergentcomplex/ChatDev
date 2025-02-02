@@ -22,7 +22,7 @@ ChatEnvConfig.brainstorming: False
 
 
 **ChatGPTConfig**:
- ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -104,7 +104,7 @@ Note that we must ONLY discuss the product modality and do not discuss anything 
 
 [2023-24-08 23:31:51 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 435
-max_tokens: 15565
+max_completion_tokens: 15565
 
 
 
@@ -210,7 +210,7 @@ Note that we must ONLY discuss the target programming language and do not discus
 
 [2023-24-08 23:31:53 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 384
-max_tokens: 15616
+max_completion_tokens: 15616
 
 
 
@@ -338,7 +338,7 @@ Please note that the code should be fully functional. Ensure to implement all fu
 
 [2023-24-08 23:31:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 558
-max_tokens: 15442
+max_completion_tokens: 15442
 
 
 
@@ -836,7 +836,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 23:32:27 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 821
-max_tokens: 15179
+max_completion_tokens: 15179
 
 
 
@@ -858,7 +858,7 @@ total_tokens: 960
 
 [2023-24-08 23:32:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 986
-max_tokens: 15014
+max_completion_tokens: 15014
 
 
 
@@ -1082,7 +1082,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 23:32:37 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 971
-max_tokens: 15029
+max_completion_tokens: 15029
 
 
 
@@ -1104,7 +1104,7 @@ total_tokens: 1526
 
 [2023-24-08 23:33:12 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1500
-max_tokens: 14500
+max_completion_tokens: 14500
 
 
 
@@ -1611,7 +1611,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 23:33:52 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 665
-max_tokens: 15335
+max_completion_tokens: 15335
 
 
 
@@ -1633,7 +1633,7 @@ total_tokens: 964
 
 [2023-24-08 23:34:08 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 990
-max_tokens: 15010
+max_completion_tokens: 15010
 
 
 
@@ -1910,7 +1910,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 23:34:09 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 975
-max_tokens: 15025
+max_completion_tokens: 15025
 
 
 
@@ -1932,7 +1932,7 @@ total_tokens: 1380
 
 [2023-24-08 23:34:33 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1354
-max_tokens: 14646
+max_completion_tokens: 14646
 
 
 
@@ -2392,7 +2392,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 23:34:58 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 781
-max_tokens: 15219
+max_completion_tokens: 15219
 
 
 
@@ -2414,7 +2414,7 @@ total_tokens: 1081
 
 [2023-24-08 23:35:16 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1107
-max_tokens: 14893
+max_completion_tokens: 14893
 
 
 
@@ -2735,7 +2735,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 23:35:17 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1092
-max_tokens: 14908
+max_completion_tokens: 14908
 
 
 
@@ -2757,7 +2757,7 @@ total_tokens: 1805
 
 [2023-24-08 23:36:00 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1779
-max_tokens: 14221
+max_completion_tokens: 14221
 
 
 
@@ -3436,7 +3436,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 23:36:48 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 827
-max_tokens: 15173
+max_completion_tokens: 15173
 
 
 
@@ -3458,7 +3458,7 @@ total_tokens: 972
 
 [2023-24-08 23:36:57 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 998
-max_tokens: 15002
+max_completion_tokens: 15002
 
 
 
@@ -3690,7 +3690,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 23:36:58 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 983
-max_tokens: 15017
+max_completion_tokens: 15017
 
 
 
@@ -3712,7 +3712,7 @@ total_tokens: 1467
 
 [2023-24-08 23:37:24 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1441
-max_tokens: 14559
+max_completion_tokens: 14559
 
 
 
@@ -4250,7 +4250,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 23:37:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 980
-max_tokens: 15020
+max_completion_tokens: 15020
 
 
 
@@ -4272,7 +4272,7 @@ total_tokens: 1098
 
 [2023-24-08 23:38:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1124
-max_tokens: 14876
+max_completion_tokens: 14876
 
 
 
@@ -4608,7 +4608,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 23:38:29 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1109
-max_tokens: 14891
+max_completion_tokens: 14891
 
 
 
@@ -4630,7 +4630,7 @@ total_tokens: 1806
 
 [2023-24-08 23:39:12 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1780
-max_tokens: 14220
+max_completion_tokens: 14220
 
 
 
@@ -5284,7 +5284,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 23:39:54 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 684
-max_tokens: 15316
+max_completion_tokens: 15316
 
 
 
@@ -5306,7 +5306,7 @@ total_tokens: 998
 
 [2023-24-08 23:40:11 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 988
-max_tokens: 15012
+max_completion_tokens: 15012
 
 
 
@@ -5607,7 +5607,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 23:40:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1188
-max_tokens: 14812
+max_completion_tokens: 14812
 
 
 
@@ -5956,7 +5956,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 23:41:01 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 684
-max_tokens: 15316
+max_completion_tokens: 15316
 
 
 
@@ -5978,7 +5978,7 @@ total_tokens: 990
 
 [2023-24-08 23:41:17 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 980
-max_tokens: 15020
+max_completion_tokens: 15020
 
 
 
@@ -6242,7 +6242,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 23:41:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1180
-max_tokens: 14820
+max_completion_tokens: 14820
 
 
 
@@ -6603,7 +6603,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 23:41:59 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 684
-max_tokens: 15316
+max_completion_tokens: 15316
 
 
 
@@ -6625,7 +6625,7 @@ total_tokens: 973
 
 [2023-24-08 23:42:15 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 963
-max_tokens: 15037
+max_completion_tokens: 15037
 
 
 
@@ -6924,7 +6924,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 23:42:37 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1163
-max_tokens: 14837
+max_completion_tokens: 14837
 
 
 
@@ -6946,7 +6946,7 @@ total_tokens: 1905
 
 [2023-24-08 23:43:18 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1895
-max_tokens: 14105
+max_completion_tokens: 14105
 
 
 
@@ -7488,7 +7488,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 23:43:58 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 683
-max_tokens: 15317
+max_completion_tokens: 15317
 
 
 
@@ -7510,7 +7510,7 @@ total_tokens: 913
 
 [2023-24-08 23:44:11 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 903
-max_tokens: 15097
+max_completion_tokens: 15097
 
 
 
@@ -7798,7 +7798,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 23:44:36 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1103
-max_tokens: 14897
+max_completion_tokens: 14897
 
 
 
@@ -8147,7 +8147,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 23:44:59 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 683
-max_tokens: 15317
+max_completion_tokens: 15317
 
 
 
@@ -8169,7 +8169,7 @@ total_tokens: 845
 
 [2023-24-08 23:45:09 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 835
-max_tokens: 15165
+max_completion_tokens: 15165
 
 
 
@@ -8419,7 +8419,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 23:45:18 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1035
-max_tokens: 14965
+max_completion_tokens: 14965
 
 
 
@@ -8769,7 +8769,7 @@ According to the codes and file format listed above, write a requirements.txt fi
 
 [2023-24-08 23:45:41 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 777
-max_tokens: 15223
+max_completion_tokens: 15223
 
 
 
@@ -8962,7 +8962,7 @@ You can add these lines to a file named `requirements.txt` and include it in you
 
 [2023-24-08 23:45:52 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1189
-max_tokens: 14811
+max_completion_tokens: 14811
 
 
 
@@ -9280,7 +9280,7 @@ Please see [here](https://python.langchain.com) for full documentation on:
 
 [2023-24-08 23:46:00 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1033
-max_tokens: 14967
+max_completion_tokens: 14967
 
 
 

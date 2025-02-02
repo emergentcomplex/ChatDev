@@ -22,7 +22,7 @@ ChatEnvConfig.brainstorming: False
 
 
 **ChatGPTConfig**:
- ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -57,7 +57,7 @@ I will give you a short description of a software design requirement,           
 
 [2023-21-08 20:46:06 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 137
-max_tokens: 15863
+max_completion_tokens: 15863
 
 
 
@@ -153,7 +153,7 @@ Note that we must ONLY discuss the product modality and do not discuss anything 
 
 [2023-21-08 20:46:09 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 502
-max_tokens: 15498
+max_completion_tokens: 15498
 
 
 
@@ -175,7 +175,7 @@ total_tokens: 601
 
 [2023-21-08 20:46:12 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 638
-max_tokens: 15362
+max_completion_tokens: 15362
 
 
 
@@ -288,7 +288,7 @@ Note that we must ONLY discuss the target programming language and do not discus
 
 [2023-21-08 20:46:13 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 528
-max_tokens: 15472
+max_completion_tokens: 15472
 
 
 
@@ -400,7 +400,7 @@ Please note that the code should be fully functional. Ensure to implement all fu
 
 [2023-21-08 20:46:14 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 711
-max_tokens: 15289
+max_completion_tokens: 15289
 
 
 
@@ -973,7 +973,7 @@ As the Programmer, to satisfy the complete function of our developed software, y
 
 [2023-21-08 20:46:38 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1304
-max_tokens: 14696
+max_completion_tokens: 14696
 
 
 
@@ -1423,7 +1423,7 @@ As the Programmer, to satisfy the complete function of our developed software, y
 
 [2023-21-08 20:47:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1404
-max_tokens: 14596
+max_completion_tokens: 14596
 
 
 
@@ -1836,7 +1836,7 @@ As the Programmer, to satisfy the complete function of our developed software, y
 
 [2023-21-08 20:47:28 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1396
-max_tokens: 14604
+max_completion_tokens: 14604
 
 
 
@@ -2216,7 +2216,7 @@ Now, tell me your comment with the highest priority and corresponding suggestion
 
 [2023-21-08 20:47:52 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1350
-max_tokens: 14650
+max_completion_tokens: 14650
 
 
 
@@ -2238,7 +2238,7 @@ total_tokens: 1612
 
 [2023-21-08 20:48:00 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1638
-max_tokens: 14362
+max_completion_tokens: 14362
 
 
 
@@ -2512,7 +2512,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 
 [2023-21-08 20:48:01 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1646
-max_tokens: 14354
+max_completion_tokens: 14354
 
 
 
@@ -2534,7 +2534,7 @@ total_tokens: 2504
 
 [2023-21-08 20:48:24 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2530
-max_tokens: 13470
+max_completion_tokens: 13470
 
 
 
@@ -3095,7 +3095,7 @@ Now, tell me your comment with the highest priority and corresponding suggestion
 
 [2023-21-08 20:48:51 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1350
-max_tokens: 14650
+max_completion_tokens: 14650
 
 
 
@@ -3117,7 +3117,7 @@ total_tokens: 1575
 
 [2023-21-08 20:48:59 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1601
-max_tokens: 14399
+max_completion_tokens: 14399
 
 
 
@@ -3397,7 +3397,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 
 [2023-21-08 20:49:05 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1609
-max_tokens: 14391
+max_completion_tokens: 14391
 
 
 
@@ -3419,7 +3419,7 @@ total_tokens: 2483
 
 [2023-21-08 20:49:30 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2509
-max_tokens: 13491
+max_completion_tokens: 13491
 
 
 
@@ -4002,7 +4002,7 @@ According to the codes and file format listed above, write a requirements.txt fi
 
 [2023-21-08 20:50:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1358
-max_tokens: 14642
+max_completion_tokens: 14642
 
 
 
@@ -4217,7 +4217,7 @@ Please note that the versions mentioned in the requirements.txt file are just ex
 
 [2023-21-08 20:50:07 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1806
-max_tokens: 14194
+max_completion_tokens: 14194
 
 
 
@@ -4470,7 +4470,7 @@ Please see [here](https://python.langchain.com) for full documentation on:
 
 [2023-21-08 20:50:08 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1611
-max_tokens: 14389
+max_completion_tokens: 14389
 
 
 

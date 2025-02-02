@@ -59,13 +59,12 @@ def modal_trans(task_dsp):
         messages = [{"role": "user", "content": task_in}]
         response = client.chat.completions.create(messages=messages,
         model="gpt-3.5-turbo-16k",
-        temperature=0.2,
         top_p=1.0,
         n=1,
         stream=False,
         frequency_penalty=0.0,
         presence_penalty=0.0,
-        logit_bias={})
+        )
         response_text = response.choices[0].message.content
         spider_content = get_wiki_content(response_text)
         # time.sleep(1)
@@ -74,13 +73,12 @@ def modal_trans(task_dsp):
         messages = [{"role": "user", "content": task_in}]
         response = client.chat.completions.create(messages=messages,
         model="gpt-3.5-turbo-16k",
-        temperature=0.2,
         top_p=1.0,
         n=1,
         stream=False,
         frequency_penalty=0.0,
         presence_penalty=0.0,
-        logit_bias={})
+        )
         result = response.choices[0].message.content
         print("web spider content:", result)
     except:

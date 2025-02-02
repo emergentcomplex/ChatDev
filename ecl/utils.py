@@ -157,7 +157,7 @@ class OpenAIModel(ModelBackend):
 
         num_max_token = num_max_token_map[self.model_type]
         num_max_completion_tokens = num_max_token - num_prompt_tokens
-        self.model_config_dict['max_tokens'] = num_max_completion_tokens
+        self.model_config_dict['max_completion_tokens'] = num_max_completion_tokens
         log_and_print_online(
             "InstructionStar generation:\n**[OpenAI_Usage_Info Receive]**\nprompt_tokens: {}\ncompletion_tokens: {}\ntotal_tokens: {}\n".format(
                 response["usage"]["prompt_tokens"], response["usage"]["completion_tokens"],

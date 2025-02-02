@@ -23,7 +23,7 @@ ChatEnvConfig.gui_design: True
 
 
 **ChatGPTConfig**:
-ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -6538,30 +6538,50 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 1
 
 [2023-06-10 04:07:16 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:07:19 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:07:19 INFO] System: **[chatting]**
@@ -6831,16 +6851,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 According to my test reports, please locate and summarize the bugs that cause the problem.
 
@@ -7166,16 +7196,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 Error Summary of Test Reports:
 "Based on the error message in the test reports, the bug causing the problem is in the `initialize_blinds()` method of the `Game` class in the `game.py` file. The error message states that the 'AIPlayer' object has no attribute 'set_blind'. 
@@ -7660,30 +7700,50 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 2
 
 [2023-06-10 04:08:54 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:08:57 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:08:57 INFO] System: **[chatting]**
@@ -7953,16 +8013,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 According to my test reports, please locate and summarize the bugs that cause the problem.
 
@@ -8282,16 +8352,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 Error Summary of Test Reports:
 "Based on the error message in the test report, the bug causing the problem is in the `initialize_blinds()` method of the `Game` class in the `game.py` file. The error message states that the 'AIPlayer' object has no attribute 'set_blind'. This means that the `AIPlayer` class does not have a `set_blind` method, which is being called in the `initialize_blinds()` method.
@@ -8867,30 +8947,50 @@ execute SimplePhase:[TestErrorSummary] in ComposedPhase:[Test], cycle 3
 
 [2023-06-10 04:10:55 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:10:58 INFO] **[Test Reports]**:
 
-Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 
 
 [2023-06-10 04:10:58 INFO] System: **[chatting]**
@@ -9160,16 +9260,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 According to my test reports, please locate and summarize the bugs that cause the problem.
 
@@ -9495,16 +9605,26 @@ class Deck:
 
 "
 Test Reports of Source Codes:
-"Traceback (most recent call last):
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
-    main()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
-    game.start()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
-    self.initialize_blinds()
-  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
-    player.set_blind(self.small_blind)
-AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+"Traceback (most recent call last):
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 11, in <module>
+
+    main()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\main.py", line 9, in main
+
+    game.start()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 17, in start
+
+    self.initialize_blinds()
+
+  File "C:\Users\piema\ChatDev\WareHouse\Poker1_DefaultOrganization_20231006035628\game.py", line 28, in initialize_blinds
+
+    player.set_blind(self.small_blind)
+
+AttributeError: 'AIPlayer' object has no attribute 'set_blind'
+
 "
 Error Summary of Test Reports:
 "Based on the provided test reports, the bug causing the problem is in the `initialize_blinds()` method of the `Game` class in the `game.py` file. The error message states that the 'AIPlayer' object has no attribute 'set_blind'. This means that the `AIPlayer` class does not have a `set_blind` method, which is being called in the `initialize_blinds()` method.

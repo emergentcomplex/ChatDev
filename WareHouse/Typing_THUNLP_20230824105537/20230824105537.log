@@ -22,7 +22,7 @@ ChatEnvConfig.brainstorming: False
 
 
 **ChatGPTConfig**:
- ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -100,7 +100,7 @@ Note that we must ONLY discuss the product modality and do not discuss anything 
 [2023-24-08 10:55:45 INFO] flask app.py did not start for online log
 [2023-24-08 10:55:45 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 586
-max_tokens: 15414
+max_completion_tokens: 15414
 
 
 
@@ -199,7 +199,7 @@ Note that we must ONLY discuss the target programming language and do not discus
 [2023-24-08 10:56:01 INFO] flask app.py did not start for online log
 [2023-24-08 10:56:01 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 686
-max_tokens: 15314
+max_completion_tokens: 15314
 
 
 
@@ -320,7 +320,7 @@ Please note that the code should be fully functional. Ensure to implement all fu
 [2023-24-08 10:56:16 INFO] flask app.py did not start for online log
 [2023-24-08 10:56:16 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 860
-max_tokens: 15140
+max_completion_tokens: 15140
 
 
 
@@ -1174,7 +1174,7 @@ Now, you should check the above regulations one by one and review the codes in d
 [2023-24-08 10:57:44 INFO] flask app.py did not start for online log
 [2023-24-08 10:57:44 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1744
-max_tokens: 14256
+max_completion_tokens: 14256
 
 
 
@@ -1194,7 +1194,7 @@ total_tokens: 1932
 [2023-24-08 10:57:59 INFO] flask app.py did not start for online log
 [2023-24-08 10:57:59 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1958
-max_tokens: 14042
+max_completion_tokens: 14042
 
 
 
@@ -1514,7 +1514,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 [2023-24-08 10:58:29 INFO] flask app.py did not start for online log
 [2023-24-08 10:58:29 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1943
-max_tokens: 14057
+max_completion_tokens: 14057
 
 
 
@@ -1534,7 +1534,7 @@ total_tokens: 3052
 [2023-24-08 10:59:36 INFO] flask app.py did not start for online log
 [2023-24-08 10:59:36 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3026
-max_tokens: 12974
+max_completion_tokens: 12974
 
 
 
@@ -2392,7 +2392,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 11:00:48 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1766
-max_tokens: 14234
+max_completion_tokens: 14234
 
 
 
@@ -2414,7 +2414,7 @@ total_tokens: 2667
 
 [2023-24-08 11:01:45 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2693
-max_tokens: 13307
+max_completion_tokens: 13307
 
 
 
@@ -3029,7 +3029,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 11:01:46 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2678
-max_tokens: 13322
+max_completion_tokens: 13322
 
 
 
@@ -3051,7 +3051,7 @@ total_tokens: 3781
 
 [2023-24-08 11:02:43 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3755
-max_tokens: 12245
+max_completion_tokens: 12245
 
 
 
@@ -3998,7 +3998,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 11:03:48 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1811
-max_tokens: 14189
+max_completion_tokens: 14189
 
 
 
@@ -4295,7 +4295,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 11:03:57 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1843
-max_tokens: 14157
+max_completion_tokens: 14157
 
 
 
@@ -4317,7 +4317,7 @@ total_tokens: 2964
 
 [2023-24-08 11:04:57 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2938
-max_tokens: 13062
+max_completion_tokens: 13062
 
 
 
@@ -5144,7 +5144,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 11:05:56 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1811
-max_tokens: 14189
+max_completion_tokens: 14189
 
 
 
@@ -5166,7 +5166,7 @@ total_tokens: 1991
 
 [2023-24-08 11:06:08 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2017
-max_tokens: 13983
+max_completion_tokens: 13983
 
 
 
@@ -5581,7 +5581,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 11:06:19 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2002
-max_tokens: 13998
+max_completion_tokens: 13998
 
 
 
@@ -5603,7 +5603,7 @@ total_tokens: 3143
 
 [2023-24-08 11:07:25 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3117
-max_tokens: 12883
+max_completion_tokens: 12883
 
 
 
@@ -6428,7 +6428,7 @@ Now, you should check the above regulations one by one and review the codes in d
 
 [2023-24-08 11:08:22 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1811
-max_tokens: 14189
+max_completion_tokens: 14189
 
 
 
@@ -6450,7 +6450,7 @@ total_tokens: 2011
 
 [2023-24-08 11:08:34 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2037
-max_tokens: 13963
+max_completion_tokens: 13963
 
 
 
@@ -6775,7 +6775,7 @@ As the Programmer, to satisfy the new user's demand and make the software creati
 
 [2023-24-08 11:08:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2023
-max_tokens: 13977
+max_completion_tokens: 13977
 
 
 
@@ -6797,7 +6797,7 @@ total_tokens: 3206
 
 [2023-24-08 11:09:45 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3180
-max_tokens: 12820
+max_completion_tokens: 12820
 
 
 
@@ -7690,7 +7690,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:10:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1542
-max_tokens: 14458
+max_completion_tokens: 14458
 
 
 
@@ -7712,7 +7712,7 @@ total_tokens: 1888
 
 [2023-24-08 11:11:13 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1878
-max_tokens: 14122
+max_completion_tokens: 14122
 
 
 
@@ -8054,7 +8054,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 11:11:33 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2078
-max_tokens: 13922
+max_completion_tokens: 13922
 
 
 
@@ -8671,7 +8671,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:12:40 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1542
-max_tokens: 14458
+max_completion_tokens: 14458
 
 
 
@@ -8693,7 +8693,7 @@ total_tokens: 1808
 
 [2023-24-08 11:12:57 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1798
-max_tokens: 14202
+max_completion_tokens: 14202
 
 
 
@@ -9047,7 +9047,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 11:13:11 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1998
-max_tokens: 14002
+max_completion_tokens: 14002
 
 
 
@@ -9670,7 +9670,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:14:18 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1542
-max_tokens: 14458
+max_completion_tokens: 14458
 
 
 
@@ -9692,7 +9692,7 @@ total_tokens: 1743
 
 [2023-24-08 11:14:30 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1733
-max_tokens: 14267
+max_completion_tokens: 14267
 
 
 
@@ -10047,7 +10047,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 11:14:33 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1933
-max_tokens: 14067
+max_completion_tokens: 14067
 
 
 
@@ -10670,7 +10670,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:15:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1542
-max_tokens: 14458
+max_completion_tokens: 14458
 
 
 
@@ -10692,7 +10692,7 @@ total_tokens: 1830
 
 [2023-24-08 11:15:52 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1820
-max_tokens: 14180
+max_completion_tokens: 14180
 
 
 
@@ -11026,7 +11026,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 11:16:10 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2020
-max_tokens: 13980
+max_completion_tokens: 13980
 
 
 
@@ -11489,7 +11489,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:16:42 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1542
-max_tokens: 14458
+max_completion_tokens: 14458
 
 
 
@@ -11511,7 +11511,7 @@ total_tokens: 1895
 
 [2023-24-08 11:17:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1885
-max_tokens: 14115
+max_completion_tokens: 14115
 
 
 
@@ -11853,7 +11853,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 
 [2023-24-08 11:17:23 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2085
-max_tokens: 13915
+max_completion_tokens: 13915
 
 
 
@@ -12467,7 +12467,7 @@ According to the codes and file format listed above, write a requirements.txt fi
 
 [2023-24-08 11:18:24 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1787
-max_tokens: 14213
+max_completion_tokens: 14213
 
 
 
@@ -12736,7 +12736,7 @@ The keyboard package is used in the typing_tutor.py file to capture keyboard eve
 
 [2023-24-08 11:18:30 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2253
-max_tokens: 13747
+max_completion_tokens: 13747
 
 
 
@@ -13139,7 +13139,7 @@ Please see [here](https://python.langchain.com) for full documentation on:
 
 [2023-24-08 11:18:39 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2049
-max_tokens: 13951
+max_completion_tokens: 13951
 
 
 

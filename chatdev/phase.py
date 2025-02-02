@@ -135,7 +135,7 @@ class Phase(ABC):
             conversation_meta = "**" + assistant_role_name + "<->" + user_role_name + " on : " + str(
                 phase_name) + ", turn " + str(i) + "**\n\n"
 
-            # TODO: max_tokens_exceeded errors here
+            # TODO: max_completion_tokens_exceeded errors here
             if isinstance(assistant_response.msg, ChatMessage):
                 # we log the second interaction here
                 log_visualize(role_play_session.assistant_agent.role_name,

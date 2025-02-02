@@ -22,7 +22,7 @@ ChatEnvConfig.brainstorming: False
 
 
 **ChatGPTConfig**:
- ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -60,7 +60,7 @@ then you should return a message in a format like "<INFO> revised_version_of_the
 [2023-23-08 10:29:41 INFO] flask app.py did not start for online log
 [2023-23-08 10:29:42 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 166
-max_tokens: 15834
+max_completion_tokens: 15834
 
 
 
@@ -160,7 +160,7 @@ Note that we must ONLY discuss the product modality and do not discuss anything 
 [2023-23-08 10:30:07 INFO] flask app.py did not start for online log
 [2023-23-08 10:30:07 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 579
-max_tokens: 15421
+max_completion_tokens: 15421
 
 
 
@@ -258,7 +258,7 @@ Note that we must ONLY discuss the target programming language and do not discus
 [2023-23-08 10:30:24 INFO] flask app.py did not start for online log
 [2023-23-08 10:30:24 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 673
-max_tokens: 15327
+max_completion_tokens: 15327
 
 
 
@@ -378,7 +378,7 @@ Please note that the code should be fully functional. Ensure to implement all fu
 [2023-23-08 10:30:40 INFO] flask app.py did not start for online log
 [2023-23-08 10:30:40 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 847
-max_tokens: 15153
+max_completion_tokens: 15153
 
 
 
@@ -936,7 +936,7 @@ As the Programmer, to satisfy the complete function of our developed software, y
 [2023-23-08 10:31:39 INFO] flask app.py did not start for online log
 [2023-23-08 10:31:39 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1234
-max_tokens: 14766
+max_completion_tokens: 14766
 
 
 
@@ -1359,7 +1359,7 @@ As the Programmer, to satisfy the complete function of our developed software, y
 [2023-23-08 10:32:32 INFO] flask app.py did not start for online log
 [2023-23-08 10:32:32 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1633
-max_tokens: 14367
+max_completion_tokens: 14367
 
 
 
@@ -1799,7 +1799,7 @@ Now, check the above regulations one by one and tell me your comment with the hi
 [2023-23-08 10:33:17 INFO] flask app.py did not start for online log
 [2023-23-08 10:33:17 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1898
-max_tokens: 14102
+max_completion_tokens: 14102
 
 
 
@@ -1819,7 +1819,7 @@ total_tokens: 2173
 [2023-23-08 10:33:38 INFO] flask app.py did not start for online log
 [2023-23-08 10:33:38 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2199
-max_tokens: 13801
+max_completion_tokens: 13801
 
 
 
@@ -2147,7 +2147,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 [2023-23-08 10:33:58 INFO] flask app.py did not start for online log
 [2023-23-08 10:33:58 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2158
-max_tokens: 13842
+max_completion_tokens: 13842
 
 
 
@@ -2167,7 +2167,7 @@ total_tokens: 3435
 [2023-23-08 10:35:08 INFO] flask app.py did not start for online log
 [2023-23-08 10:35:08 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3461
-max_tokens: 12539
+max_completion_tokens: 12539
 
 
 
@@ -2917,7 +2917,7 @@ Now, check the above regulations one by one and tell me your comment with the hi
 [2023-23-08 10:36:27 INFO] flask app.py did not start for online log
 [2023-23-08 10:36:27 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1898
-max_tokens: 14102
+max_completion_tokens: 14102
 
 
 
@@ -2937,7 +2937,7 @@ total_tokens: 2445
 [2023-23-08 10:37:03 INFO] flask app.py did not start for online log
 [2023-23-08 10:37:03 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2471
-max_tokens: 13529
+max_completion_tokens: 13529
 
 
 
@@ -3343,7 +3343,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 [2023-23-08 10:37:23 INFO] flask app.py did not start for online log
 [2023-23-08 10:37:23 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2430
-max_tokens: 13570
+max_completion_tokens: 13570
 
 
 
@@ -3363,7 +3363,7 @@ total_tokens: 3668
 [2023-23-08 10:38:35 INFO] flask app.py did not start for online log
 [2023-23-08 10:38:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3694
-max_tokens: 12306
+max_completion_tokens: 12306
 
 
 
@@ -4154,7 +4154,7 @@ Now, check the above regulations one by one and tell me your comment with the hi
 [2023-23-08 10:40:09 INFO] flask app.py did not start for online log
 [2023-23-08 10:40:09 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1868
-max_tokens: 14132
+max_completion_tokens: 14132
 
 
 
@@ -4174,7 +4174,7 @@ total_tokens: 2107
 [2023-23-08 10:40:26 INFO] flask app.py did not start for online log
 [2023-23-08 10:40:26 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2133
-max_tokens: 13867
+max_completion_tokens: 13867
 
 
 
@@ -4487,7 +4487,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 [2023-23-08 10:40:46 INFO] flask app.py did not start for online log
 [2023-23-08 10:40:46 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2092
-max_tokens: 13908
+max_completion_tokens: 13908
 
 
 
@@ -4507,7 +4507,7 @@ total_tokens: 3324
 [2023-23-08 10:41:58 INFO] flask app.py did not start for online log
 [2023-23-08 10:41:58 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3350
-max_tokens: 12650
+max_completion_tokens: 12650
 
 
 
@@ -5268,7 +5268,7 @@ Now, check the above regulations one by one and tell me your comment with the hi
 [2023-23-08 10:43:30 INFO] flask app.py did not start for online log
 [2023-23-08 10:43:30 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1868
-max_tokens: 14132
+max_completion_tokens: 14132
 
 
 
@@ -5288,7 +5288,7 @@ total_tokens: 2107
 [2023-23-08 10:43:47 INFO] flask app.py did not start for online log
 [2023-23-08 10:43:47 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2133
-max_tokens: 13867
+max_completion_tokens: 13867
 
 
 
@@ -5601,7 +5601,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 [2023-23-08 10:44:08 INFO] flask app.py did not start for online log
 [2023-23-08 10:44:08 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2092
-max_tokens: 13908
+max_completion_tokens: 13908
 
 
 
@@ -5621,7 +5621,7 @@ total_tokens: 3279
 [2023-23-08 10:45:26 INFO] flask app.py did not start for online log
 [2023-23-08 10:45:26 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3305
-max_tokens: 12695
+max_completion_tokens: 12695
 
 
 
@@ -6367,7 +6367,7 @@ Now, check the above regulations one by one and tell me your comment with the hi
 [2023-23-08 10:46:55 INFO] flask app.py did not start for online log
 [2023-23-08 10:46:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1868
-max_tokens: 14132
+max_completion_tokens: 14132
 
 
 
@@ -6387,7 +6387,7 @@ total_tokens: 2105
 [2023-23-08 10:47:12 INFO] flask app.py did not start for online log
 [2023-23-08 10:47:12 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2131
-max_tokens: 13869
+max_completion_tokens: 13869
 
 
 
@@ -6706,7 +6706,7 @@ As the Code Reviewer, to satisfy the new user's demand and make the software cre
 [2023-23-08 10:47:32 INFO] flask app.py did not start for online log
 [2023-23-08 10:47:32 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2090
-max_tokens: 13910
+max_completion_tokens: 13910
 
 
 
@@ -6726,7 +6726,7 @@ total_tokens: 3322
 [2023-23-08 10:48:48 INFO] flask app.py did not start for online log
 [2023-23-08 10:48:48 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3348
-max_tokens: 12652
+max_completion_tokens: 12652
 
 
 
@@ -7477,7 +7477,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 [2023-23-08 10:50:28 INFO] flask app.py did not start for online log
 [2023-23-08 10:50:28 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1588
-max_tokens: 14412
+max_completion_tokens: 14412
 
 
 
@@ -7497,7 +7497,7 @@ total_tokens: 1790
 [2023-23-08 10:50:45 INFO] flask app.py did not start for online log
 [2023-23-08 10:50:45 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1780
-max_tokens: 14220
+max_completion_tokens: 14220
 
 
 
@@ -7788,7 +7788,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 [2023-23-08 10:51:19 INFO] flask app.py did not start for online log
 [2023-23-08 10:51:19 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1763
-max_tokens: 14237
+max_completion_tokens: 14237
 
 
 
@@ -7808,7 +7808,7 @@ total_tokens: 3002
 [2023-23-08 10:52:35 INFO] flask app.py did not start for online log
 [2023-23-08 10:52:35 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2992
-max_tokens: 13008
+max_completion_tokens: 13008
 
 
 
@@ -8403,7 +8403,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 [2023-23-08 10:53:02 INFO] flask app.py did not start for online log
 [2023-23-08 10:53:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1588
-max_tokens: 14412
+max_completion_tokens: 14412
 
 
 
@@ -8423,7 +8423,7 @@ total_tokens: 2170
 [2023-23-08 10:53:41 INFO] flask app.py did not start for online log
 [2023-23-08 10:53:41 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2160
-max_tokens: 13840
+max_completion_tokens: 13840
 
 
 
@@ -8860,7 +8860,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 [2023-23-08 10:54:27 INFO] flask app.py did not start for online log
 [2023-23-08 10:54:27 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1763
-max_tokens: 14237
+max_completion_tokens: 14237
 
 
 
@@ -9397,7 +9397,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 [2023-23-08 10:56:02 INFO] flask app.py did not start for online log
 [2023-23-08 10:56:02 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1588
-max_tokens: 14412
+max_completion_tokens: 14412
 
 
 
@@ -9417,7 +9417,7 @@ total_tokens: 1885
 [2023-23-08 10:56:22 INFO] flask app.py did not start for online log
 [2023-23-08 10:56:23 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1875
-max_tokens: 14125
+max_completion_tokens: 14125
 
 
 
@@ -9700,7 +9700,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 [2023-23-08 10:56:50 INFO] flask app.py did not start for online log
 [2023-23-08 10:56:50 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1763
-max_tokens: 14237
+max_completion_tokens: 14237
 
 
 
@@ -10225,7 +10225,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 [2023-23-08 10:58:11 INFO] flask app.py did not start for online log
 [2023-23-08 10:58:11 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1588
-max_tokens: 14412
+max_completion_tokens: 14412
 
 
 
@@ -10245,7 +10245,7 @@ total_tokens: 1886
 [2023-23-08 10:58:32 INFO] flask app.py did not start for online log
 [2023-23-08 10:58:32 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1876
-max_tokens: 14124
+max_completion_tokens: 14124
 
 
 
@@ -10538,7 +10538,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 [2023-23-08 10:59:05 INFO] flask app.py did not start for online log
 [2023-23-08 10:59:05 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1763
-max_tokens: 14237
+max_completion_tokens: 14237
 
 
 
@@ -11077,7 +11077,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 [2023-23-08 11:00:46 INFO] flask app.py did not start for online log
 [2023-23-08 11:00:46 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1588
-max_tokens: 14412
+max_completion_tokens: 14412
 
 
 
@@ -11097,7 +11097,7 @@ total_tokens: 1934
 [2023-23-08 11:01:13 INFO] flask app.py did not start for online log
 [2023-23-08 11:01:13 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1924
-max_tokens: 14076
+max_completion_tokens: 14076
 
 
 
@@ -11400,7 +11400,7 @@ As the Programmer, to satisfy the new user's demand and make the software execut
 [2023-23-08 11:01:51 INFO] flask app.py did not start for online log
 [2023-23-08 11:01:51 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1763
-max_tokens: 14237
+max_completion_tokens: 14237
 
 
 
@@ -11931,7 +11931,7 @@ According to the codes and file format listed above, write a requirements.txt fi
 [2023-23-08 11:03:10 INFO] flask app.py did not start for online log
 [2023-23-08 11:03:10 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1827
-max_tokens: 14173
+max_completion_tokens: 14173
 
 
 
@@ -12174,7 +12174,7 @@ In this case, the only dependency required for the project is the `tkinter` pack
 [2023-23-08 11:03:31 INFO] flask app.py did not start for online log
 [2023-23-08 11:03:31 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2316
-max_tokens: 13684
+max_completion_tokens: 13684
 
 
 
@@ -12532,7 +12532,7 @@ Please see [here](https://python.langchain.com) for full documentation on:
 [2023-23-08 11:03:55 INFO] flask app.py did not start for online log
 [2023-23-08 11:03:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2071
-max_tokens: 13929
+max_completion_tokens: 13929
 
 
 

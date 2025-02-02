@@ -1,0 +1,1858 @@
+
+
+/home/brandon/Projects/ChatDev/chatdev/eval_quality.py
+
+import os
+import re
+import signal
+import subprocess
+import time
+import numpy as np
+from openai import OpenAI
+client = OpenAI(
+    api_key='',
+    base_url="",
+)
+def getFilesFromType(sourceDir, filetype):
+    files = []
+    for root, directories, filenames in os.walk(sourceDir):
+        for filename in filenames:
+            if filename.endswith(filetype):
+                files.append(os.path.join(root, filename))
+    return files
+def get_code(directory):
+    def _format_code(code):
+        code = "\n".join([line for line in code.split("\n") if len(line.strip()) > 0])
+        return code
+    codebooks = {}
+    filepaths = getFilesFromType(directory, ".py")
+    for filepath in filepaths:
+        filename = os.path.basename(filepath)
+        codebooks[filename] = _format_code(open(filepath, "r", encoding="utf-8").read())
+    code = ""
+    for filename in codebooks.keys():
+        code += "{}\n```Python\n{}\n```\n\n".format(filename, codebooks[filename])
+    if len(code) == 0:
+        code = "# None"
+    return code.strip()
+def get_completeness(directory):
+    assert os.path.isdir(directory)
+    vn = get_code(directory)
+    lines = vn.split("\n")
+    lines = [line for line in lines if
+             "password" not in line.lower() and "passenger" not in line.lower() and "passed" not in line.lower() and "passes" not in line.lower()]
+    lines = [line for line in lines if "pass" in line.lower() or "todo" in line.lower()]
+    if len(lines) > 0:
+        return 0.0
+    return 1.0
+def get_executability(directory):
+    assert os.path.isdir(directory)
+    def findFile(directory, target):
+        main_py_path = None
+        for subroot, _, filenames in os.walk(directory):
+            for filename in filenames:
+                if target in filename:
+                    main_py_path = os.path.join(subroot, filename)
+        return main_py_path
+    def exist_bugs(directory):
+        assert os.path.isdir(directory)
+        success_info = "The software run successfully without errors."
+        try:
+            command = "cd \"{}\"; ls -l; python3 main.py;".format(directory)
+            process = subprocess.Popen(command, shell=True, preexec_fn=os.setsid, stdout=subprocess.PIPE,
+                                       stderr=subprocess.PIPE)
+            time.sleep(3)
+            error_type = ""
+            return_code = process.returncode
+            if process.poll() is None:
+                os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            if return_code == 0:
+                return False, success_info, error_type
+            else:
+                error_output = process.stderr.read().decode('utf-8')
+                try:
+                    error_pattern = r'\w+Error:'
+                    error_matches = re.findall(error_pattern, error_output)
+                    error_type = error_matches[0].replace(":", "")
+                except:
+                    pass
+                if error_output:
+                    if "Traceback".lower() in error_output.lower():
+                        errs = error_output.replace(directory + "/", "")
+                        return True, errs, error_type
+                else:
+                    return False, success_info, error_type
+        except subprocess.CalledProcessError as e:
+            return True, f"Error: {e}", "subprocess.CalledProcessError"
+        except Exception as ex:
+            return True, f"An error occurred: {ex}", "OtherException"
+        return False, success_info, error_type
+    main_py_path = findFile(directory, ".py")
+    pass_flag, error_type = True, ""
+    if main_py_path is not None:
+        main_py_path = os.path.dirname(main_py_path)
+        bug_flag, info, error_type = exist_bugs(main_py_path)
+        pass_flag = not bug_flag
+    else:
+        pass_flag, error_type = False, "NoMain"
+    if error_type == "":
+        error_type = info.replace("\n", "\\n")
+    if pass_flag:
+        return  1.0
+    return 0.0
+def get_consistency(directory):
+    def remove_comments(string):
+        def remove_comments_by_regex(string, regex):
+            lines = string.split("\n")
+            lines = [line for line in lines if not line.strip().startswith("#")]
+            string = "\n".join(lines)
+            comments = []
+            matches = re.finditer(regex, string, re.DOTALL)
+            for match in matches:
+                group1 = match.group(1)
+                comments.append(group1)
+            for comment in comments + ["''''''\n"]:
+                string = string.replace(comment, "")
+            return string
+        string = remove_comments_by_regex(string, r"'''(.*?)'''")
+        string = remove_comments_by_regex(string, r"\"\"\"(.*?)\"\"\"")
+        return string
+    def get_text_embedding(text: str):
+        if text == "":
+            text = "None"
+        ada_embedding = client.embeddings.create(input=text, model="text-embedding-ada-002").model_dump()['data'][0]['embedding']
+        return ada_embedding
+    def get_code_embedding(code: str):
+        if code == "":
+            code = "#"
+        ada_embedding = client.embeddings.create(input=code, model="text-embedding-ada-002").model_dump()['data'][0]['embedding']
+        return ada_embedding
+    def get_cosine_similarity(embeddingi, embeddingj):
+        embeddingi = np.array(embeddingi)
+        embeddingj = np.array(embeddingj)
+        cos_sim = embeddingi.dot(embeddingj) / (np.linalg.norm(embeddingi) * np.linalg.norm(embeddingj))
+        return cos_sim
+    assert os.path.isdir(directory)
+    files = getFilesFromType(directory, ".txt")
+    if len(files) == 0:
+        print()
+    filepath = files[0]
+    task = open(filepath).read().strip()
+    codes = get_code(directory)
+    codes = remove_comments(codes)
+    text_embedding = get_text_embedding(task)
+    code_embedding = get_code_embedding(codes)
+    task_code_alignment = get_cosine_similarity(text_embedding, code_embedding)
+    return task_code_alignment
+def main(warehouse_root):
+    def write_string(string):
+        writer.write(string)
+        print(string, end="")
+    directories = []
+    for directory in os.listdir(warehouse_root):
+        directories.append(os.path.join(warehouse_root, directory))
+    directories = sorted(directories)
+    directories = [directory for directory in directories if os.path.isdir(directory)]
+    print("len(directories):", len(directories))
+    suffix = warehouse_root.replace("/", "__").replace("-", "_")
+    tsv_file = __file__.replace(".py", ".{}.tsv".format(suffix))
+    print("tsv_file:", tsv_file)
+    counter = 0
+    completeness_list, executability_list, consistency_list = [], [], []
+    with open(tsv_file, "a", encoding="utf-8") as writer:
+        for i, directory in enumerate(directories):
+            directory_basename = os.path.basename(directory)
+            completeness = get_completeness(directory)
+            executability = get_executability(directory)
+            consistency = get_consistency(directory)
+            completeness_list.append(completeness)
+            executability_list.append(executability)
+            consistency_list.append(consistency)
+            counter += 1
+main(warehouse_root = "./WareHouse")
+
+
+/home/brandon/Projects/ChatDev/chatdev/statistics.py
+
+import os
+import numpy as np
+def prompt_cost(model_type: str, num_prompt_tokens: float, num_completion_tokens: float):
+    input_cost_map = {
+        "gpt-3.5-turbo": 0.0005,
+        "gpt-3.5-turbo-16k": 0.003,
+        "gpt-3.5-turbo-0613": 0.0015,
+        "gpt-3.5-turbo-16k-0613": 0.003,
+        "gpt-4": 0.03,
+        "gpt-4-0613": 0.03,
+        "gpt-4-32k": 0.06,
+        "gpt-4-turbo": 0.01,
+        "gpt-4o": 0.005,
+        "gpt-4o-mini": 0.00015,
+        "o1-preview": 0.0,
+    }
+    output_cost_map = {
+        "gpt-3.5-turbo": 0.0015,
+        "gpt-3.5-turbo-16k": 0.004,
+        "gpt-3.5-turbo-0613": 0.002,
+        "gpt-3.5-turbo-16k-0613": 0.004,
+        "gpt-4": 0.06,
+        "gpt-4-0613": 0.06,
+        "gpt-4-32k": 0.12,
+        "gpt-4-turbo": 0.03,
+        "gpt-4o": 0.015,
+        "gpt-4o-mini": 0.0006,
+        "o1-preview": 0.0,
+    }
+    if model_type not in input_cost_map or model_type not in output_cost_map:
+        return -1
+    return num_prompt_tokens * input_cost_map[model_type] / 1000.0 + num_completion_tokens * output_cost_map[model_type] / 1000.0
+def get_info(dir, log_filepath):
+    print("dir:", dir)
+    model_type = ""
+    version_updates = -1
+    num_code_files = -1
+    num_png_files = -1
+    num_doc_files = -1
+    code_lines = -1
+    env_lines = -1
+    manual_lines = -1
+    duration = -1
+    num_utterance = -1
+    num_reflection = -1
+    num_prompt_tokens = -1
+    num_completion_tokens = -1
+    num_total_tokens = -1
+    if os.path.exists(dir):
+        filenames = os.listdir(dir)
+        num_code_files = len([filename for filename in filenames if filename.endswith(".py")])
+        num_png_files = len([filename for filename in filenames if filename.endswith(".png")])
+        num_doc_files = 0
+        for filename in filenames:
+            if filename.endswith(".py") or filename.endswith(".png"):
+                continue
+            if os.path.isfile(os.path.join(dir, filename)):
+                num_doc_files += 1
+        if "meta.txt" in filenames:
+            lines = open(os.path.join(dir, "meta.txt"), "r", encoding="utf8").read().split("\n")
+            version_updates = float([lines[i + 1] for i, line in enumerate(lines) if "Code_Version" in line][0]) + 1
+        else:
+            version_updates = -1
+        if "requirements.txt" in filenames:
+            lines = open(os.path.join(dir, "requirements.txt"), "r", encoding="utf8").read().split("\n")
+            env_lines = len([line for line in lines if len(line.strip()) > 0])
+        else:
+            env_lines = -1
+        if "manual.md" in filenames:
+            lines = open(os.path.join(dir, "manual.md"), "r", encoding="utf8").read().split("\n")
+            manual_lines = len([line for line in lines if len(line.strip()) > 0])
+        else:
+            manual_lines = -1
+        code_lines = 0
+        for filename in filenames:
+            if filename.endswith(".py"):
+                lines = open(os.path.join(dir, filename), "r", encoding="utf8").read().split("\n")
+                code_lines += len([line for line in lines if len(line.strip()) > 0])
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        sublines = [line for line in lines if "| **model_type** |" in line]
+        if len(sublines) > 0:
+            model_type = sublines[0].split("| **model_type** | ModelType.")[-1].split(" | ")[0]
+            model_type = model_type[:-2]
+            if model_type == "GPT_3_5_TURBO" or model_type == "GPT_3_5_TURBO_NEW":
+                model_type = "gpt-3.5-turbo"
+            elif model_type == "GPT_4":
+                model_type = "gpt-4"
+            elif model_type == "GPT_4_32k":
+                model_type = "gpt-4-32k"
+            elif model_type == "GPT_4_TURBO":
+                model_type = "gpt-4-turbo"
+            elif model_type == "GPT_4O":
+                model_type = "gpt-4o"
+            elif model_type == "GPT_4O_MINI":
+                model_type = "gpt-4o-mini"
+            elif model_type == "O1_PREVIEW":
+                model_type = "o1-preview"
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        start_lines = [line for line in lines if "**[Start Chat]**" in line]
+        chat_lines = [line for line in lines if "<->" in line]
+        num_utterance = len(start_lines) + len(chat_lines)
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        sublines = [line for line in lines if line.startswith("prompt_tokens:")]
+        if len(sublines) > 0:
+            nums = [int(line.split(": ")[-1]) for line in sublines]
+            num_prompt_tokens = np.sum(nums)
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        sublines = [line for line in lines if line.startswith("completion_tokens:")]
+        if len(sublines) > 0:
+            nums = [int(line.split(": ")[-1]) for line in sublines]
+            num_completion_tokens = np.sum(nums)
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        sublines = [line for line in lines if line.startswith("total_tokens:")]
+        if len(sublines) > 0:
+            nums = [int(line.split(": ")[-1]) for line in sublines]
+            num_total_tokens = np.sum(nums)
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
+        num_reflection = 0
+        for line in lines:
+            if "on : Reflection" in line:
+                num_reflection += 1
+    cost = 0.0
+    if num_png_files != -1:
+        cost += num_png_files * 0.016
+    if prompt_cost(model_type, num_prompt_tokens, num_completion_tokens) != -1:
+        cost += prompt_cost(model_type, num_prompt_tokens, num_completion_tokens)
+    info = "\n\n💰**cost**=${:.6f}\n\n🔨**version_updates**={}\n\n📃**num_code_files**={}\n\n🏞**num_png_files**={}\n\n📚**num_doc_files**={}\n\n📃**code_lines**={}\n\n📋**env_lines**={}\n\n📒**manual_lines**={}\n\n🗣**num_utterances**={}\n\n🤔**num_self_reflections**={}\n\n❓**num_prompt_tokens**={}\n\n❗**num_completion_tokens**={}\n\n🌟**num_total_tokens**={}" \
+        .format(cost,
+                version_updates,
+                num_code_files,
+                num_png_files,
+                num_doc_files,
+                code_lines,
+                env_lines,
+                manual_lines,
+                num_utterance,
+                num_reflection,
+                num_prompt_tokens,
+                num_completion_tokens,
+                num_total_tokens)
+    return info
+
+
+/home/brandon/Projects/ChatDev/chatdev/chat_env.py
+
+import os
+import re
+import shutil
+import signal
+import subprocess
+import time
+from typing import Dict
+import openai
+import requests
+from chatdev.codes import Codes
+from chatdev.documents import Documents
+from chatdev.roster import Roster
+from chatdev.utils import log_visualize
+from ecl.memory import Memory
+try:
+    from openai.types.chat.chat_completion_message_tool_call import ChatCompletionMessageToolCall
+    from openai.types.chat.chat_completion_message import FunctionCall
+    openai_new_api = True  except ImportError:
+    openai_new_api = False  class ChatEnvConfig:
+    def __init__(self, clear_structure,
+                 gui_design,
+                 git_management,
+                 incremental_develop,
+                 background_prompt,
+                 with_memory):
+        self.clear_structure = clear_structure          self.gui_design = gui_design          self.git_management = git_management          self.incremental_develop = incremental_develop          self.background_prompt = background_prompt          self.with_memory = with_memory     def __str__(self):
+        string = ""
+        string += "ChatEnvConfig.with_memory: {}\n".format(self.with_memory)
+        string += "ChatEnvConfig.clear_structure: {}\n".format(self.clear_structure)
+        string += "ChatEnvConfig.git_management: {}\n".format(self.git_management)
+        string += "ChatEnvConfig.gui_design: {}\n".format(self.gui_design)
+        string += "ChatEnvConfig.incremental_develop: {}\n".format(self.incremental_develop)
+        string += "ChatEnvConfig.background_prompt: {}\n".format(self.background_prompt)
+        return string
+class ChatEnv:
+    def __init__(self, chat_env_config: ChatEnvConfig):
+        self.config = chat_env_config
+        self.roster: Roster = Roster()
+        self.codes: Codes = Codes()
+        self.memory: Memory = Memory()
+        self.proposed_images: Dict[str, str] = {}
+        self.incorporated_images: Dict[str, str] = {}
+        self.requirements: Documents = Documents()
+        self.manuals: Documents = Documents()
+        self.env_dict = {
+            "directory": "",
+            "task_prompt": "",
+            "task_description":"",
+            "modality": "",
+            "ideas": "",
+            "language": "",
+            "review_comments": "",
+            "error_summary": "",
+            "test_reports": ""
+        }
+    @staticmethod
+    def fix_module_not_found_error(test_reports):
+        if "ModuleNotFoundError" in test_reports:
+            for match in re.finditer(r"No module named '(\S+)'", test_reports, re.DOTALL):
+                module = match.group(1)
+                subprocess.Popen("pip install {}".format(module), shell=True).wait()
+                log_visualize("**[CMD Execute]**\n\n[CMD] pip install {}".format(module))
+    def set_directory(self, directory):
+        assert len(self.env_dict['directory']) == 0
+        self.env_dict['directory'] = directory
+        self.codes.directory = directory
+        self.requirements.directory = directory
+        self.manuals.directory = directory
+        if os.path.exists(self.env_dict['directory']) and len(os.listdir(directory)) > 0:
+            new_directory = "{}.{}".format(directory, time.strftime("%Y%m%d%H%M%S", time.localtime()))
+            shutil.copytree(directory, new_directory)
+            print("{} Copied to {}".format(directory, new_directory))
+        if os.path.exists(self.env_dict['directory']):
+            shutil.rmtree(self.env_dict['directory'])
+            os.mkdir(self.env_dict['directory'])
+            print("{} Created".format(directory))
+        else:
+            os.mkdir(self.env_dict['directory'])
+    def init_memory(self):
+        self.memory.id_enabled = True
+        self.memory.directory = os.path.join(os.getcwd(),"ecl","memory")
+        if not os.path.exists(self.memory.directory):
+            os.mkdir(self.memory.directory)
+        self.memory.upload()
+    def exist_bugs(self) -> tuple[bool, str]:
+        directory = self.env_dict['directory']
+        success_info = "The software run successfully without errors."
+        try:
+            if os.name == 'nt':
+                command = "cd {} && dir && python main.py".format(directory)
+                process = subprocess.Popen(
+                    command,
+                    shell=True,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
+                )
+            else:
+                command = "cd {}; ls -l; python3 main.py;".format(directory)
+                process = subprocess.Popen(command,
+                                           shell=True,
+                                           preexec_fn=os.setsid,
+                                           stdout=subprocess.PIPE,
+                                           stderr=subprocess.PIPE
+                                           )
+            time.sleep(3)
+            return_code = process.returncode
+            if process.poll() is None:
+                if "killpg" in dir(os):
+                    os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+                else:
+                    os.kill(process.pid, signal.SIGTERM)
+                    if process.poll() is None:
+                        os.kill(process.pid, signal.CTRL_BREAK_EVENT)
+            if return_code == 0:
+                return False, success_info
+            else:
+                error_output = process.stderr.read().decode('utf-8')
+                if error_output:
+                    if "Traceback".lower() in error_output.lower():
+                        errs = error_output.replace(directory + "/", "")
+                        return True, errs
+                else:
+                    return False, success_info
+        except subprocess.CalledProcessError as e:
+            return True, f"Error: {e}"
+        except Exception as ex:
+            return True, f"An error occurred: {ex}"
+        return False, success_info
+    def recruit(self, agent_name: str):
+        self.roster._recruit(agent_name)
+    def exist_employee(self, agent_name: str) -> bool:
+        return self.roster._exist_employee(agent_name)
+    def print_employees(self):
+        self.roster._print_employees()
+    def update_codes(self, generated_content):
+        self.codes._update_codes(generated_content)
+    def rewrite_codes(self, phase_info=None) -> None:
+        self.codes._rewrite_codes(self.config.git_management, phase_info)
+    def get_codes(self) -> str:
+        return self.codes._get_codes()
+    def _load_from_hardware(self, directory) -> None:
+        self.codes._load_from_hardware(directory)
+    def _update_requirements(self, generated_content):
+        self.requirements._update_docs(generated_content)
+    def rewrite_requirements(self):
+        self.requirements._rewrite_docs()
+    def get_requirements(self) -> str:
+        return self.requirements._get_docs()
+    def _update_manuals(self, generated_content):
+        self.manuals._update_docs(generated_content, parse=False, predifined_filename="manual.md")
+    def rewrite_manuals(self):
+        self.manuals._rewrite_docs()
+    def write_meta(self) -> None:
+        directory = self.env_dict['directory']
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+            print("{} Created.".format(directory))
+        meta_filename = "meta.txt"
+        with open(os.path.join(directory, meta_filename), "w", encoding="utf-8") as writer:
+            writer.write("{}:\n{}\n\n".format("Task", self.env_dict['task_prompt']))
+            writer.write("{}:\n{}\n\n".format("Config", self.config.__str__()))
+            writer.write("{}:\n{}\n\n".format("Roster", ", ".join(self.roster.agents)))
+            writer.write("{}:\n{}\n\n".format("Modality", self.env_dict['modality']))
+            writer.write("{}:\n{}\n\n".format("Ideas", self.env_dict['ideas']))
+            writer.write("{}:\n{}\n\n".format("Language", self.env_dict['language']))
+            writer.write("{}:\n{}\n\n".format("Code_Version", self.codes.version))
+            writer.write("{}:\n{}\n\n".format("Proposed_images", len(self.proposed_images.keys())))
+            writer.write("{}:\n{}\n\n".format("Incorporated_images", len(self.incorporated_images.keys())))
+        print(os.path.join(directory, meta_filename), "Wrote")
+    def generate_images_from_codes(self):
+        def download(img_url, file_name):
+            r = requests.get(img_url)
+            filepath = os.path.join(self.env_dict['directory'], file_name)
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            with open(filepath, "wb") as f:
+                f.write(r.content)
+                print("{} Downloaded".format(filepath))
+        regex = r"(\w+.png)"
+        joined_codes = self.get_codes()
+        matches = re.finditer(regex, joined_codes, re.DOTALL)
+        for match in matches:
+            filename = match.group(1).strip()
+            if filename in self.proposed_images.keys():
+                self.incorporated_images[filename] = self.proposed_images[filename]
+            else:
+                self.incorporated_images[filename] = filename.replace("_", " ")
+        for filename in self.incorporated_images.keys():
+            if not os.path.exists(os.path.join(self.env_dict['directory'], filename)):
+                desc = self.incorporated_images[filename]
+                if desc.endswith(".png"):
+                    desc = desc.replace(".png", "")
+                print("{}: {}".format(filename, desc))
+                if openai_new_api:
+                    response = openai.images.generate(
+                        prompt=desc,
+                        n=1,
+                        size="256x256"
+                    )
+                    image_url = response.data[0].url
+                else:
+                    response = openai.Image.create(
+                        prompt=desc,
+                        n=1,
+                        size="256x256"
+                    )
+                    image_url = response['data'][0]['url']
+                download(image_url, filename)
+    def get_proposed_images_from_message(self, messages):
+        def download(img_url, file_name):
+            r = requests.get(img_url)
+            filepath = os.path.join(self.env_dict['directory'], file_name)
+            if os.path.exists(filepath):
+                os.remove(filepath)
+            with open(filepath, "wb") as f:
+                f.write(r.content)
+                print("{} Downloaded".format(filepath))
+        regex = r"(\w+.png):(.*?)\n"
+        matches = re.finditer(regex, messages, re.DOTALL)
+        images = {}
+        for match in matches:
+            filename = match.group(1).strip()
+            desc = match.group(2).strip()
+            images[filename] = desc
+        if len(images.keys()) == 0:
+            regex = r"(\w+.png)"
+            matches = re.finditer(regex, messages, re.DOTALL)
+            images = {}
+            for match in matches:
+                filename = match.group(1).strip()
+                desc = " ".join(filename.replace(".png", "").split("_"))
+                images[filename] = desc
+                print("{}: {}".format(filename, images[filename]))
+        for filename in images.keys():
+            if not os.path.exists(os.path.join(self.env_dict['directory'], filename)):
+                desc = images[filename]
+                if desc.endswith(".png"):
+                    desc = desc.replace(".png", "")
+                print("{}: {}".format(filename, desc))
+                if openai_new_api:
+                    response = openai.images.generate(
+                        prompt=desc,
+                        n=1,
+                        size="256x256"
+                    )
+                    image_url = response.data[0].url
+                else:
+                    response = openai.Image.create(
+                        prompt=desc,
+                        n=1,
+                        size="256x256"
+                    )
+                    image_url = response['data'][0]['url']
+                download(image_url, filename)
+        return images
+
+
+/home/brandon/Projects/ChatDev/chatdev/composed_phase.py
+
+import importlib
+import os
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from camel.typing import ModelType
+from chatdev.chat_env import ChatEnv
+from chatdev.utils import log_visualize
+def check_bool(s):
+    return s.lower() == "true"
+class ComposedPhase(ABC):
+    def __init__(self,
+                 phase_name: str = None,
+                 cycle_num: int = None,
+                 composition: list = None,
+                 config_phase: dict = None,
+                 config_role: dict = None,
+                 model_type: ModelType = ModelType.GPT_3_5_TURBO,
+                 log_filepath: str = ""
+                 ):
+        """
+        Args:
+            phase_name: name of this phase
+            cycle_num: loop times of this phase
+            composition: list of SimplePhases in this ComposePhase
+            config_phase: configuration of all SimplePhases
+            config_role: configuration of all Roles
+        """
+        self.phase_name = phase_name
+        self.cycle_num = cycle_num
+        self.composition = composition
+        self.model_type = model_type
+        self.log_filepath = log_filepath
+        self.config_phase = config_phase
+        self.config_role = config_role
+        self.phase_env = dict()
+        self.phase_env["cycle_num"] = cycle_num
+        self.chat_turn_limit_default = 10
+        self.role_prompts = dict()
+        for role in self.config_role:
+            self.role_prompts[role] = "\n".join(self.config_role[role])
+        self.phases = dict()
+        for phase in self.config_phase:
+            assistant_role_name = self.config_phase[phase]['assistant_role_name']
+            user_role_name = self.config_phase[phase]['user_role_name']
+            phase_prompt = "\n".join(self.config_phase[phase]['phase_prompt'])
+            phase_module = importlib.import_module("chatdev.phase")
+            phase_class = getattr(phase_module, phase)
+            phase_instance = phase_class(assistant_role_name=assistant_role_name,
+                                         user_role_name=user_role_name,
+                                         phase_prompt=phase_prompt,
+                                         role_prompts=self.role_prompts,
+                                         phase_name=phase,
+                                         model_type=self.model_type,
+                                         log_filepath=self.log_filepath)
+            self.phases[phase] = phase_instance
+    @abstractmethod
+    def update_phase_env(self, chat_env):
+        """
+        update self.phase_env (if needed) using chat_env, then the chatting will use self.phase_env to follow the context and fill placeholders in phase prompt
+        must be implemented in customized phase
+        the usual format is just like:
+        ```
+            self.phase_env.update({key:chat_env[key]})
+        ```
+        Args:
+            chat_env: global chat chain environment
+        Returns: None
+        """
+        pass
+    @abstractmethod
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        """
+        update chan_env based on the results of self.execute, which is self.seminar_conclusion
+        must be implemented in customized phase
+        the usual format is just like:
+        ```
+            chat_env.xxx = some_func_for_postprocess(self.seminar_conclusion)
+        ```
+        Args:
+            chat_env:global chat chain environment
+        Returns:
+            chat_env: updated global chat chain environment
+        """
+        pass
+    @abstractmethod
+    def break_cycle(self, phase_env) -> bool:
+        """
+        special conditions for early break the loop in ComposedPhase
+        Args:
+            phase_env: phase environment
+        Returns: None
+        """
+        pass
+    def execute(self, chat_env) -> ChatEnv:
+        """
+        similar to Phase.execute, but add control for breaking the loop
+        1. receive information from environment(ComposedPhase): update the phase environment from global environment
+        2. for each SimplePhase in ComposedPhase
+            a) receive information from environment(SimplePhase)
+            b) check loop break
+            c) execute the chatting
+            d) change the environment(SimplePhase)
+            e) check loop break
+        3. change the environment(ComposedPhase): update the global environment using the conclusion
+        Args:
+            chat_env: global chat chain environment
+        Returns:
+        """
+        self.update_phase_env(chat_env)
+        for cycle_index in range(1, self.cycle_num + 1):
+            for phase_item in self.composition:
+                assert phase_item["phaseType"] == "SimplePhase"                  phase = phase_item['phase']
+                max_turn_step = phase_item['max_turn_step']
+                need_reflect = check_bool(phase_item['need_reflect'])
+                self.phase_env["cycle_index"] = cycle_index
+                log_visualize(
+                    f"**[Execute Detail]**\n\nexecute SimplePhase:[{phase}] in ComposedPhase:[{self.phase_name}], cycle {cycle_index}")
+                if phase in self.phases:
+                    self.phases[phase].phase_env = self.phase_env
+                    self.phases[phase].update_phase_env(chat_env)
+                    if self.break_cycle(self.phases[phase].phase_env):
+                        return chat_env
+                    chat_env = self.phases[phase].execute(chat_env,
+                                                          self.chat_turn_limit_default if max_turn_step <= 0 else max_turn_step,
+                                                          need_reflect)
+                    if self.break_cycle(self.phases[phase].phase_env):
+                        return chat_env
+                else:
+                    print(f"Phase '{phase}' is not yet implemented. \
+                            Please write its config in phaseConfig.json \
+                            and implement it in chatdev.phase")
+        chat_env = self.update_chat_env(chat_env)
+        return chat_env
+class Art(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        pass
+    def update_chat_env(self, chat_env):
+        return chat_env
+    def break_cycle(self, chat_env) -> bool:
+        return False
+class CodeCompleteAll(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        pyfiles = [filename for filename in os.listdir(chat_env.env_dict['directory']) if filename.endswith(".py")]
+        num_tried = defaultdict(int)
+        num_tried.update({filename: 0 for filename in pyfiles})
+        self.phase_env.update({
+            "max_num_implement": 5,
+            "pyfiles": pyfiles,
+            "num_tried": num_tried
+        })
+    def update_chat_env(self, chat_env):
+        return chat_env
+    def break_cycle(self, phase_env) -> bool:
+        if phase_env['unimplemented_file'] == "":
+            return True
+        else:
+            return False
+class CodeReview(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"modification_conclusion": ""})
+    def update_chat_env(self, chat_env):
+        return chat_env
+    def break_cycle(self, phase_env) -> bool:
+        if "<INFO> Finished".lower() in phase_env['modification_conclusion'].lower():
+            return True
+        else:
+            return False
+class HumanAgentInteraction(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"modification_conclusion": "", "comments": ""})
+    def update_chat_env(self, chat_env):
+        return chat_env
+    def break_cycle(self, phase_env) -> bool:
+        if "<INFO> Finished".lower() in phase_env['modification_conclusion'].lower() or phase_env["comments"].lower() == "exit":
+            return True
+        else:
+            return False
+class Test(ComposedPhase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        pass
+    def update_chat_env(self, chat_env):
+        return chat_env
+    def break_cycle(self, phase_env) -> bool:
+        if not phase_env['exist_bugs_flag']:
+            log_visualize(f"**[Test Info]**\n\nAI User (Software Test Engineer):\nTest Pass!\n")
+            return True
+        else:
+            return False
+
+
+/home/brandon/Projects/ChatDev/chatdev/phase.py
+
+import os
+import re
+from abc import ABC, abstractmethod
+from camel.agents import RolePlaying
+from camel.messages import ChatMessage
+from camel.typing import TaskType, ModelType
+from chatdev.chat_env import ChatEnv
+from chatdev.statistics import get_info
+from chatdev.utils import log_visualize, log_arguments
+class Phase(ABC):
+    def __init__(self,
+                 assistant_role_name,
+                 user_role_name,
+                 phase_prompt,
+                 role_prompts,
+                 phase_name,
+                 model_type,
+                 log_filepath):
+        """
+        Args:
+            assistant_role_name: who receives chat in a phase
+            user_role_name: who starts the chat in a phase
+            phase_prompt: prompt of this phase
+            role_prompts: prompts of all roles
+            phase_name: name of this phase
+        """
+        self.seminar_conclusion = None
+        self.assistant_role_name = assistant_role_name
+        self.user_role_name = user_role_name
+        self.phase_prompt = phase_prompt
+        self.phase_env = dict()
+        self.phase_name = phase_name
+        self.assistant_role_prompt = role_prompts[assistant_role_name]
+        self.user_role_prompt = role_prompts[user_role_name]
+        self.ceo_prompt = role_prompts["Chief Executive Officer"]
+        self.counselor_prompt = role_prompts["Counselor"]
+        self.max_retries = 3
+        self.reflection_prompt = """Here is a conversation between two roles: {conversations} {question}"""
+        self.model_type = model_type
+        self.log_filepath = log_filepath
+    @log_arguments
+    def chatting(
+            self,
+            chat_env,
+            task_prompt: str,
+            assistant_role_name: str,
+            user_role_name: str,
+            phase_prompt: str,
+            phase_name: str,
+            assistant_role_prompt: str,
+            user_role_prompt: str,
+            task_type=TaskType.CHATDEV,
+            need_reflect=False,
+            with_task_specify=False,
+            model_type=ModelType.GPT_3_5_TURBO,
+            memory=None,
+            placeholders=None,
+            chat_turn_limit=10
+    ) -> str:
+        """
+        Args:
+            chat_env: global chatchain environment
+            task_prompt: user query prompt for building the software
+            assistant_role_name: who receives the chat
+            user_role_name: who starts the chat
+            phase_prompt: prompt of the phase
+            phase_name: name of the phase
+            assistant_role_prompt: prompt of assistant role
+            user_role_prompt: prompt of user role
+            task_type: task type
+            need_reflect: flag for checking reflection
+            with_task_specify: with task specify
+            model_type: model type
+            placeholders: placeholders for phase environment to generate phase prompt
+            chat_turn_limit: turn limits in each chat
+        Returns:
+        """
+        if placeholders is None:
+            placeholders = {}
+        assert 1 <= chat_turn_limit <= 100
+        if not chat_env.exist_employee(assistant_role_name):
+            raise ValueError(f"{assistant_role_name} not recruited in ChatEnv.")
+        if not chat_env.exist_employee(user_role_name):
+            raise ValueError(f"{user_role_name} not recruited in ChatEnv.")
+        role_play_session = RolePlaying(
+            assistant_role_name=assistant_role_name,
+            user_role_name=user_role_name,
+            assistant_role_prompt=assistant_role_prompt,
+            user_role_prompt=user_role_prompt,
+            task_prompt=task_prompt,
+            task_type=task_type,
+            with_task_specify=with_task_specify,
+            memory=memory,
+            model_type=model_type,
+            background_prompt=chat_env.config.background_prompt
+        )
+        _, input_user_msg = role_play_session.init_chat(None, placeholders, phase_prompt)
+        seminar_conclusion = None
+        for i in range(chat_turn_limit):
+            assistant_response, user_response = role_play_session.step(input_user_msg, chat_turn_limit == 1)
+            conversation_meta = "**" + assistant_role_name + "<->" + user_role_name + " on : " + str(
+                phase_name) + ", turn " + str(i) + "**\n\n"
+            if isinstance(assistant_response.msg, ChatMessage):
+                log_visualize(role_play_session.assistant_agent.role_name,
+                              conversation_meta + "[" + role_play_session.user_agent.system_message.content + "]\n\n" + assistant_response.msg.content)
+                if role_play_session.assistant_agent.info:
+                    seminar_conclusion = assistant_response.msg.content
+                    break
+                if assistant_response.terminated:
+                    break
+            if isinstance(user_response.msg, ChatMessage):
+                log_visualize(role_play_session.user_agent.role_name,
+                              conversation_meta + "[" + role_play_session.assistant_agent.system_message.content + "]\n\n" + user_response.msg.content)
+                if role_play_session.user_agent.info:
+                    seminar_conclusion = user_response.msg.content
+                    break
+                if user_response.terminated:
+                    break
+            if chat_turn_limit > 1 and isinstance(user_response.msg, ChatMessage):
+                input_user_msg = user_response.msg
+            else:
+                break
+        if need_reflect:
+            if seminar_conclusion in [None, ""]:
+                seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session, phase_name,
+                                                                      chat_env)
+            if "recruiting" in phase_name:
+                if "Yes".lower() not in seminar_conclusion.lower() and "No".lower() not in seminar_conclusion.lower():
+                    seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session,
+                                                                          phase_name,
+                                                                          chat_env)
+            elif seminar_conclusion in [None, ""]:
+                seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session, phase_name,
+                                                                      chat_env)
+        else:
+            seminar_conclusion = assistant_response.msg.content
+        log_visualize("**[Seminar Conclusion]**:\n\n {}".format(seminar_conclusion))
+        seminar_conclusion = seminar_conclusion.split("<INFO>")[-1]
+        return seminar_conclusion
+    def self_reflection(self,
+                        task_prompt: str,
+                        role_play_session: RolePlaying,
+                        phase_name: str,
+                        chat_env: ChatEnv) -> str:
+        """
+        Args:
+            task_prompt: user query prompt for building the software
+            role_play_session: role play session from the chat phase which needs reflection
+            phase_name: name of the chat phase which needs reflection
+            chat_env: global chatchain environment
+        Returns:
+            reflected_content: str, reflected results
+        """
+        messages = role_play_session.assistant_agent.stored_messages if len(
+            role_play_session.assistant_agent.stored_messages) >= len(
+            role_play_session.user_agent.stored_messages) else role_play_session.user_agent.stored_messages
+        messages = ["{}: {}".format(message.role_name, message.content.replace("\n\n", "\n")) for message in messages]
+        messages = "\n\n".join(messages)
+        if "recruiting" in phase_name:
+            question = """Answer their final discussed conclusion (Yes or No) in the discussion without any other words, e.g., "Yes" """
+        elif phase_name == "DemandAnalysis":
+            question = """Answer their final product modality in the discussion without any other words, e.g., "PowerPoint" """
+        elif phase_name == "LanguageChoose":
+            question = """Conclude the programming language being discussed for software development, in the format: "*" where '*' represents a programming language." """
+        elif phase_name == "EnvironmentDoc":
+            question = """According to the codes and file format listed above, write a requirements.txt file to specify the dependencies or packages required for the project to run properly." """
+        else:
+            raise ValueError(f"Reflection of phase {phase_name}: Not Assigned.")
+        reflected_content = \
+            self.chatting(chat_env=chat_env,
+                          task_prompt=task_prompt,
+                          assistant_role_name="Chief Executive Officer",
+                          user_role_name="Counselor",
+                          phase_prompt=self.reflection_prompt,
+                          phase_name="Reflection",
+                          assistant_role_prompt=self.ceo_prompt,
+                          user_role_prompt=self.counselor_prompt,
+                          placeholders={"conversations": messages, "question": question},
+                          need_reflect=False,
+                          memory=chat_env.memory,
+                          chat_turn_limit=1,
+                          model_type=self.model_type)
+        if "recruiting" in phase_name:
+            if "Yes".lower() in reflected_content.lower():
+                return "Yes"
+            return "No"
+        else:
+            return reflected_content
+    @abstractmethod
+    def update_phase_env(self, chat_env):
+        """
+        update self.phase_env (if needed) using chat_env, then the chatting will use self.phase_env to follow the context and fill placeholders in phase prompt
+        must be implemented in customized phase
+        the usual format is just like:
+        ```
+            self.phase_env.update({key:chat_env[key]})
+        ```
+        Args:
+            chat_env: global chat chain environment
+        Returns: None
+        """
+        pass
+    @abstractmethod
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        """
+        update chan_env based on the results of self.execute, which is self.seminar_conclusion
+        must be implemented in customized phase
+        the usual format is just like:
+        ```
+            chat_env.xxx = some_func_for_postprocess(self.seminar_conclusion)
+        ```
+        Args:
+            chat_env:global chat chain environment
+        Returns:
+            chat_env: updated global chat chain environment
+        """
+        pass
+    def execute(self, chat_env, chat_turn_limit, need_reflect) -> ChatEnv:
+        """
+        execute the chatting in this phase
+        1. receive information from environment: update the phase environment from global environment
+        2. execute the chatting
+        3. change the environment: update the global environment using the conclusion
+        Args:
+            chat_env: global chat chain environment
+            chat_turn_limit: turn limit in each chat
+            need_reflect: flag for reflection
+        Returns:
+            chat_env: updated global chat chain environment using the conclusion from this phase execution
+        """
+        self.update_phase_env(chat_env)
+        self.seminar_conclusion = \
+            self.chatting(chat_env=chat_env,
+                          task_prompt=chat_env.env_dict['task_prompt'],
+                          need_reflect=need_reflect,
+                          assistant_role_name=self.assistant_role_name,
+                          user_role_name=self.user_role_name,
+                          phase_prompt=self.phase_prompt,
+                          phase_name=self.phase_name,
+                          assistant_role_prompt=self.assistant_role_prompt,
+                          user_role_prompt=self.user_role_prompt,
+                          chat_turn_limit=chat_turn_limit,
+                          placeholders=self.phase_env,
+                          memory=chat_env.memory,
+                          model_type=self.model_type)
+        chat_env = self.update_chat_env(chat_env)
+        return chat_env
+class DemandAnalysis(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        pass
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        if len(self.seminar_conclusion) > 0:
+            chat_env.env_dict['modality'] = self.seminar_conclusion.split("<INFO>")[-1].lower().replace(".", "").strip()
+        return chat_env
+class LanguageChoose(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "description": chat_env.env_dict['task_description'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas']})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        if len(self.seminar_conclusion) > 0 and "<INFO>" in self.seminar_conclusion:
+            chat_env.env_dict['language'] = self.seminar_conclusion.split("<INFO>")[-1].lower().replace(".", "").strip()
+        elif len(self.seminar_conclusion) > 0:
+            chat_env.env_dict['language'] = self.seminar_conclusion
+        else:
+            chat_env.env_dict['language'] = "Python"
+        return chat_env
+class Coding(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        gui = "" if not chat_env.config.gui_design \
+            else "The software should be equipped with graphical user interface (GUI) so that user can visually and graphically use it; so you must choose a GUI framework (e.g., in Python, you can implement GUI via tkinter, Pygame, Flexx, PyGUI, etc,)."
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "description": chat_env.env_dict['task_description'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "gui": gui})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.update_codes(self.seminar_conclusion)
+        if len(chat_env.codes.codebooks.keys()) == 0:
+            raise ValueError("No Valid Codes.")
+        chat_env.rewrite_codes("Finish Coding")
+        log_visualize(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class ArtDesign(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env = {"task": chat_env.env_dict['task_prompt'],
+                          "description": chat_env.env_dict['task_description'],
+                          "language": chat_env.env_dict['language'],
+                          "codes": chat_env.get_codes()}
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.proposed_images = chat_env.get_proposed_images_from_message(self.seminar_conclusion)
+        log_visualize(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class ArtIntegration(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env = {"task": chat_env.env_dict['task_prompt'],
+                          "language": chat_env.env_dict['language'],
+                          "codes": chat_env.get_codes(),
+                          "images": "\n".join(
+                              ["{}: {}".format(filename, chat_env.proposed_images[filename]) for
+                               filename in sorted(list(chat_env.proposed_images.keys()))])}
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.update_codes(self.seminar_conclusion)
+        chat_env.rewrite_codes("Finish Art Integration")
+        log_visualize(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class CodeComplete(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes(),
+                               "unimplemented_file": ""})
+        unimplemented_file = ""
+        for filename in self.phase_env['pyfiles']:
+            code_content = open(os.path.join(chat_env.env_dict['directory'], filename)).read()
+            lines = [line.strip() for line in code_content.split("\n") if line.strip() == "pass"]
+            if len(lines) > 0 and self.phase_env['num_tried'][filename] < self.phase_env['max_num_implement']:
+                unimplemented_file = filename
+                break
+        self.phase_env['num_tried'][unimplemented_file] += 1
+        self.phase_env['unimplemented_file'] = unimplemented_file
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.update_codes(self.seminar_conclusion)
+        if len(chat_env.codes.codebooks.keys()) == 0:
+            raise ValueError("No Valid Codes.")
+        chat_env.rewrite_codes("Code Complete #" + str(self.phase_env["cycle_index"]) + " Finished")
+        log_visualize(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class CodeReviewComment(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update(
+            {"task": chat_env.env_dict['task_prompt'],
+             "modality": chat_env.env_dict['modality'],
+             "ideas": chat_env.env_dict['ideas'],
+             "language": chat_env.env_dict['language'],
+             "codes": chat_env.get_codes(),
+             "images": ", ".join(chat_env.incorporated_images)})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.env_dict['review_comments'] = self.seminar_conclusion
+        return chat_env
+class CodeReviewModification(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes(),
+                               "comments": chat_env.env_dict['review_comments']})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        if "```".lower() in self.seminar_conclusion.lower():
+            chat_env.update_codes(self.seminar_conclusion)
+            chat_env.rewrite_codes("Review #" + str(self.phase_env["cycle_index"]) + " Finished")
+            log_visualize(
+                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        self.phase_env['modification_conclusion'] = self.seminar_conclusion
+        return chat_env
+class CodeReviewHuman(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes()})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        if "```".lower() in self.seminar_conclusion.lower():
+            chat_env.update_codes(self.seminar_conclusion)
+            chat_env.rewrite_codes("Human Review #" + str(self.phase_env["cycle_index"]) + " Finished")
+            log_visualize(
+                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+    def execute(self, chat_env, chat_turn_limit, need_reflect) -> ChatEnv:
+        self.update_phase_env(chat_env)
+        log_visualize(
+            f"**[Human-Agent-Interaction]**\n\n"
+            f"Now you can participate in the development of the software!\n"
+            f"The task is:  {chat_env.env_dict['task_prompt']}\n"
+            f"Please input your feedback (in multiple lines). It can be bug report or new feature requirement.\n"
+            f"You are currently in the #{self.phase_env['cycle_index']} human feedback with a total of {self.phase_env['cycle_num']} feedbacks\n"
+            f"Type 'end' on a separate line to submit.\n"
+            f"You can type \"Exit\" to quit this mode at any time.\n"
+        )
+        provided_comments = []
+        while True:
+            user_input = input(">>>>>>")
+            if user_input.strip().lower() == "end":
+                break
+            if user_input.strip().lower() == "exit":
+                provided_comments = ["exit"]
+                break
+            provided_comments.append(user_input)
+        self.phase_env["comments"] = '\n'.join(provided_comments)
+        log_visualize(
+            f"**[User Provided Comments]**\n\n In the #{self.phase_env['cycle_index']} of total {self.phase_env['cycle_num']} comments: \n\n" +
+            self.phase_env["comments"])
+        if self.phase_env["comments"].strip().lower() == "exit":
+            return chat_env
+        self.seminar_conclusion = \
+            self.chatting(chat_env=chat_env,
+                          task_prompt=chat_env.env_dict['task_prompt'],
+                          need_reflect=need_reflect,
+                          assistant_role_name=self.assistant_role_name,
+                          user_role_name=self.user_role_name,
+                          phase_prompt=self.phase_prompt,
+                          phase_name=self.phase_name,
+                          assistant_role_prompt=self.assistant_role_prompt,
+                          user_role_prompt=self.user_role_prompt,
+                          chat_turn_limit=chat_turn_limit,
+                          placeholders=self.phase_env,
+                          memory=chat_env.memory,
+                          model_type=self.model_type)
+        chat_env = self.update_chat_env(chat_env)
+        return chat_env
+class TestErrorSummary(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        chat_env.generate_images_from_codes()
+        (exist_bugs_flag, test_reports) = chat_env.exist_bugs()
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes(),
+                               "test_reports": test_reports,
+                               "exist_bugs_flag": exist_bugs_flag})
+        log_visualize("**[Test Reports]**:\n\n{}".format(test_reports))
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env.env_dict['error_summary'] = self.seminar_conclusion
+        chat_env.env_dict['test_reports'] = self.phase_env['test_reports']
+        return chat_env
+    def execute(self, chat_env, chat_turn_limit, need_reflect) -> ChatEnv:
+        self.update_phase_env(chat_env)
+        if "ModuleNotFoundError" in self.phase_env['test_reports']:
+            chat_env.fix_module_not_found_error(self.phase_env['test_reports'])
+            log_visualize(
+                f"Software Test Engineer found ModuleNotFoundError:\n{self.phase_env['test_reports']}\n")
+            pip_install_content = ""
+            for match in re.finditer(r"No module named '(\S+)'", self.phase_env['test_reports'], re.DOTALL):
+                module = match.group(1)
+                pip_install_content += "{}\n```{}\n{}\n```\n".format("cmd", "bash", f"pip install {module}")
+                log_visualize(f"Programmer resolve ModuleNotFoundError by:\n{pip_install_content}\n")
+            self.seminar_conclusion = "nothing need to do"
+        else:
+            self.seminar_conclusion = \
+                self.chatting(chat_env=chat_env,
+                              task_prompt=chat_env.env_dict['task_prompt'],
+                              need_reflect=need_reflect,
+                              assistant_role_name=self.assistant_role_name,
+                              user_role_name=self.user_role_name,
+                              phase_prompt=self.phase_prompt,
+                              phase_name=self.phase_name,
+                              assistant_role_prompt=self.assistant_role_prompt,
+                              user_role_prompt=self.user_role_prompt,
+                              memory=chat_env.memory,
+                              chat_turn_limit=chat_turn_limit,
+                              placeholders=self.phase_env,
+                              model_type=self.model_type)
+        chat_env = self.update_chat_env(chat_env)
+        return chat_env
+class TestModification(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "test_reports": chat_env.env_dict['test_reports'],
+                               "error_summary": chat_env.env_dict['error_summary'],
+                               "codes": chat_env.get_codes()
+                               })
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        if "```".lower() in self.seminar_conclusion.lower():
+            chat_env.update_codes(self.seminar_conclusion)
+            chat_env.rewrite_codes("Test #" + str(self.phase_env["cycle_index"]) + " Finished")
+            log_visualize(
+                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class EnvironmentDoc(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes()})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env._update_requirements(self.seminar_conclusion)
+        chat_env.rewrite_requirements()
+        log_visualize(
+            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+        return chat_env
+class Manual(Phase):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    def update_phase_env(self, chat_env):
+        self.phase_env.update({"task": chat_env.env_dict['task_prompt'],
+                               "modality": chat_env.env_dict['modality'],
+                               "ideas": chat_env.env_dict['ideas'],
+                               "language": chat_env.env_dict['language'],
+                               "codes": chat_env.get_codes(),
+                               "requirements": chat_env.get_requirements()})
+    def update_chat_env(self, chat_env) -> ChatEnv:
+        chat_env._update_manuals(self.seminar_conclusion)
+        chat_env.rewrite_manuals()
+        return chat_env
+
+
+/home/brandon/Projects/ChatDev/chatdev/utils.py
+
+import html
+import logging
+import re
+import time
+import markdown
+import inspect
+from camel.messages.system_messages import SystemMessage
+from visualizer.app import send_msg
+def now():
+    return time.strftime("%Y%m%d%H%M%S", time.localtime())
+def log_visualize(role, content=None):
+    """
+    send the role and content to visualizer server to show log on webpage in real-time
+    You can leave the role undefined and just pass the content, i.e. log_visualize("messages"), where the role is "System".
+    Args:
+        role: the agent that sends message
+        content: the content of message
+    Returns: None
+    """
+    if not content:
+        logging.info(role + "\n")
+        send_msg("System", role)
+        print(role + "\n")
+    else:
+        print(str(role) + ": " + str(content) + "\n")
+        logging.info(str(role) + ": " + str(content) + "\n")
+        if isinstance(content, SystemMessage):
+            records_kv = []
+            content.meta_dict["content"] = content.content
+            for key in content.meta_dict:
+                value = content.meta_dict[key]
+                value = escape_string(value)
+                records_kv.append([key, value])
+            content = "**[SystemMessage**]\n\n" + convert_to_markdown_table(records_kv)
+        else:
+            role = str(role)
+            content = str(content)
+        send_msg(role, content)
+def convert_to_markdown_table(records_kv):
+    header = "| Parameter | Value |\n| --- | --- |"
+    rows = [f"| **{key}** | {value} |" for (key, value) in records_kv]
+    markdown_table = header + "\n" + '\n'.join(rows)
+    return markdown_table
+def log_arguments(func):
+    def wrapper(*args, **kwargs):
+        sig = inspect.signature(func)
+        params = sig.parameters
+        all_args = {}
+        all_args.update({name: value for name, value in zip(params.keys(), args)})
+        all_args.update(kwargs)
+        records_kv = []
+        for name, value in all_args.items():
+            if name in ["self", "chat_env", "task_type"]:
+                continue
+            value = escape_string(value)
+            records_kv.append([name, value])
+        records = f"**[{func.__name__}]**\n\n" + convert_to_markdown_table(records_kv)
+        log_visualize("System", records)
+        return func(*args, **kwargs)
+    return wrapper
+def escape_string(value):
+    value = str(value)
+    value = html.unescape(value)
+    value = markdown.markdown(value)
+    value = re.sub(r'<[^>]*>', '', value)
+    value = value.replace("\n", " ")
+    return value
+
+
+/home/brandon/Projects/ChatDev/chatdev/chat_chain.py
+
+import importlib
+import json
+import logging
+import os
+import shutil
+import time
+from datetime import datetime
+from camel.agents import RolePlaying
+from camel.configs import ChatGPTConfig
+from camel.typing import TaskType, ModelType
+from chatdev.chat_env import ChatEnv, ChatEnvConfig
+from chatdev.statistics import get_info
+from camel.web_spider import modal_trans
+from chatdev.utils import log_visualize, now
+def check_bool(s):
+    return s.lower() == "true"
+class ChatChain:
+    def __init__(self,
+                 config_path: str = None,
+                 config_phase_path: str = None,
+                 config_role_path: str = None,
+                 task_prompt: str = None,
+                 project_name: str = None,
+                 org_name: str = None,
+                 model_type: ModelType = ModelType.GPT_3_5_TURBO,
+                 code_path: str = None) -> None:
+        """
+        Args:
+            config_path: path to the ChatChainConfig.json
+            config_phase_path: path to the PhaseConfig.json
+            config_role_path: path to the RoleConfig.json
+            task_prompt: the user input prompt for software
+            project_name: the user input name for software
+            org_name: the organization name of the human user
+        """
+        self.config_path = config_path
+        self.config_phase_path = config_phase_path
+        self.config_role_path = config_role_path
+        self.project_name = project_name
+        self.org_name = org_name
+        self.model_type = model_type
+        self.code_path = code_path
+        with open(self.config_path, 'r', encoding="utf8") as file:
+            self.config = json.load(file)
+        with open(self.config_phase_path, 'r', encoding="utf8") as file:
+            self.config_phase = json.load(file)
+        with open(self.config_role_path, 'r', encoding="utf8") as file:
+            self.config_role = json.load(file)
+        self.chain = self.config["chain"]
+        self.recruitments = self.config["recruitments"]
+        self.web_spider = self.config["web_spider"]
+        self.chat_turn_limit_default = 10
+        self.chat_env_config = ChatEnvConfig(clear_structure=check_bool(self.config["clear_structure"]),
+                                             gui_design=check_bool(self.config["gui_design"]),
+                                             git_management=check_bool(self.config["git_management"]),
+                                             incremental_develop=check_bool(self.config["incremental_develop"]),
+                                             background_prompt=self.config["background_prompt"],
+                                             with_memory=check_bool(self.config["with_memory"]))
+        self.chat_env = ChatEnv(self.chat_env_config)
+        self.task_prompt_raw = task_prompt
+        self.task_prompt = ""
+        self.role_prompts = dict()
+        for role in self.config_role:
+            self.role_prompts[role] = "\n".join(self.config_role[role])
+        self.start_time, self.log_filepath = self.get_logfilepath()
+        self.compose_phase_module = importlib.import_module("chatdev.composed_phase")
+        self.phase_module = importlib.import_module("chatdev.phase")
+        self.phases = dict()
+        for phase in self.config_phase:
+            assistant_role_name = self.config_phase[phase]['assistant_role_name']
+            user_role_name = self.config_phase[phase]['user_role_name']
+            phase_prompt = "\n\n".join(self.config_phase[phase]['phase_prompt'])
+            phase_class = getattr(self.phase_module, phase)
+            phase_instance = phase_class(assistant_role_name=assistant_role_name,
+                                         user_role_name=user_role_name,
+                                         phase_prompt=phase_prompt,
+                                         role_prompts=self.role_prompts,
+                                         phase_name=phase,
+                                         model_type=self.model_type,
+                                         log_filepath=self.log_filepath)
+            self.phases[phase] = phase_instance
+    def make_recruitment(self):
+        """
+        recruit all employees
+        Returns: None
+        """
+        for employee in self.recruitments:
+            self.chat_env.recruit(agent_name=employee)
+    def execute_step(self, phase_item: dict):
+        """
+        execute single phase in the chain
+        Args:
+            phase_item: single phase configuration in the ChatChainConfig.json
+        Returns:
+        """
+        phase = phase_item['phase']
+        phase_type = phase_item['phaseType']
+        if phase_type == "SimplePhase":
+            max_turn_step = phase_item['max_turn_step']
+            need_reflect = check_bool(phase_item['need_reflect'])
+            if phase in self.phases:
+                self.chat_env = self.phases[phase].execute(self.chat_env,
+                                                           self.chat_turn_limit_default if max_turn_step <= 0 else max_turn_step,
+                                                           need_reflect)
+            else:
+                raise RuntimeError(f"Phase '{phase}' is not yet implemented in chatdev.phase")
+        elif phase_type == "ComposedPhase":
+            cycle_num = phase_item['cycleNum']
+            composition = phase_item['Composition']
+            compose_phase_class = getattr(self.compose_phase_module, phase)
+            if not compose_phase_class:
+                raise RuntimeError(f"Phase '{phase}' is not yet implemented in chatdev.compose_phase")
+            compose_phase_instance = compose_phase_class(phase_name=phase,
+                                                         cycle_num=cycle_num,
+                                                         composition=composition,
+                                                         config_phase=self.config_phase,
+                                                         config_role=self.config_role,
+                                                         model_type=self.model_type,
+                                                         log_filepath=self.log_filepath)
+            self.chat_env = compose_phase_instance.execute(self.chat_env)
+        else:
+            raise RuntimeError(f"PhaseType '{phase_type}' is not yet implemented.")
+    def execute_chain(self):
+        """
+        execute the whole chain based on ChatChainConfig.json
+        Returns: None
+        """
+        for phase_item in self.chain:
+            self.execute_step(phase_item)
+    def get_logfilepath(self):
+        """
+        get the log path (under the software path)
+        Returns:
+            start_time: time for starting making the software
+            log_filepath: path to the log
+        """
+        start_time = now()
+        filepath = os.path.dirname(__file__)
+        root = os.path.dirname(filepath)
+        directory = os.path.join(root, "WareHouse")
+        log_filepath = os.path.join(directory,
+                                    "{}.log".format("_".join([self.project_name, self.org_name, start_time])))
+        return start_time, log_filepath
+    def pre_processing(self):
+        """
+        remove useless files and log some global config settings
+        Returns: None
+        """
+        filepath = os.path.dirname(__file__)
+        root = os.path.dirname(filepath)
+        directory = os.path.join(root, "WareHouse")
+        if self.chat_env.config.clear_structure:
+            for filename in os.listdir(directory):
+                file_path = os.path.join(directory, filename)
+                if os.path.isfile(file_path) and not filename.endswith(".py") and not filename.endswith(".log"):
+                    os.remove(file_path)
+                    print("{} Removed.".format(file_path))
+        software_path = os.path.join(directory, "_".join([self.project_name, self.org_name, self.start_time]))
+        self.chat_env.set_directory(software_path)
+        if self.chat_env.config.with_memory is True:
+            self.chat_env.init_memory()
+        shutil.copy(self.config_path, software_path)
+        shutil.copy(self.config_phase_path, software_path)
+        shutil.copy(self.config_role_path, software_path)
+        if check_bool(self.config["incremental_develop"]):
+            for root, dirs, files in os.walk(self.code_path):
+                relative_path = os.path.relpath(root, self.code_path)
+                target_dir = os.path.join(software_path, 'base', relative_path)
+                os.makedirs(target_dir, exist_ok=True)
+                for file in files:
+                    source_file = os.path.join(root, file)
+                    target_file = os.path.join(target_dir, file)
+                    shutil.copy2(source_file, target_file)
+            self.chat_env._load_from_hardware(os.path.join(software_path, 'base'))
+        with open(os.path.join(software_path, self.project_name + ".prompt"), "w") as f:
+            f.write(self.task_prompt_raw)
+        preprocess_msg = "**[Preprocessing]**\n\n"
+        chat_gpt_config = ChatGPTConfig()
+        preprocess_msg += "**ChatDev Starts** ({})\n\n".format(self.start_time)
+        preprocess_msg += "**Timestamp**: {}\n\n".format(self.start_time)
+        preprocess_msg += "**config_path**: {}\n\n".format(self.config_path)
+        preprocess_msg += "**config_phase_path**: {}\n\n".format(self.config_phase_path)
+        preprocess_msg += "**config_role_path**: {}\n\n".format(self.config_role_path)
+        preprocess_msg += "**task_prompt**: {}\n\n".format(self.task_prompt_raw)
+        preprocess_msg += "**project_name**: {}\n\n".format(self.project_name)
+        preprocess_msg += "**Log File**: {}\n\n".format(self.log_filepath)
+        preprocess_msg += "**ChatDevConfig**:\n{}\n\n".format(self.chat_env.config.__str__())
+        preprocess_msg += "**ChatGPTConfig**:\n{}\n\n".format(chat_gpt_config)
+        log_visualize(preprocess_msg)
+        if check_bool(self.config['self_improve']):
+            self.chat_env.env_dict['task_prompt'] = self.self_task_improve(self.task_prompt_raw)
+        else:
+            self.chat_env.env_dict['task_prompt'] = self.task_prompt_raw
+        if(check_bool(self.web_spider)):
+            self.chat_env.env_dict['task_description'] = modal_trans(self.task_prompt_raw)
+    def post_processing(self):
+        """
+        summarize the production and move log files to the software directory
+        Returns: None
+        """
+        self.chat_env.write_meta()
+        filepath = os.path.dirname(__file__)
+        root = os.path.dirname(filepath)
+        if self.chat_env_config.git_management:
+            log_git_info = "**[Git Information]**\n\n"
+            self.chat_env.codes.version += 1
+            os.system("cd {}; git add .".format(self.chat_env.env_dict["directory"]))
+            log_git_info += "cd {}; git add .\n".format(self.chat_env.env_dict["directory"])
+            os.system("cd {}; git commit -m \"v{} Final Version\"".format(self.chat_env.env_dict["directory"],
+                                                                          self.chat_env.codes.version))
+            log_git_info += "cd {}; git commit -m \"v{} Final Version\"\n".format(self.chat_env.env_dict["directory"],
+                                                                                  self.chat_env.codes.version)
+            log_visualize(log_git_info)
+            git_info = "**[Git Log]**\n\n"
+            import subprocess
+            command = "cd {}; git log".format(self.chat_env.env_dict["directory"])
+            completed_process = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE)
+            if completed_process.returncode == 0:
+                log_output = completed_process.stdout
+            else:
+                log_output = "Error when executing " + command
+            git_info += log_output
+            log_visualize(git_info)
+        post_info = "**[Post Info]**\n\n"
+        now_time = now()
+        time_format = "%Y%m%d%H%M%S"
+        datetime1 = datetime.strptime(self.start_time, time_format)
+        datetime2 = datetime.strptime(now_time, time_format)
+        duration = (datetime2 - datetime1).total_seconds()
+        post_info += "Software Info: {}".format(
+            get_info(self.chat_env.env_dict['directory'], self.log_filepath) + "\n\n🕑**duration**={:.2f}s\n\n".format(
+                duration))
+        post_info += "ChatDev Starts ({})".format(self.start_time) + "\n\n"
+        post_info += "ChatDev Ends ({})".format(now_time) + "\n\n"
+        directory = self.chat_env.env_dict['directory']
+        if self.chat_env.config.clear_structure:
+            for filename in os.listdir(directory):
+                file_path = os.path.join(directory, filename)
+                if os.path.isdir(file_path) and file_path.endswith("__pycache__"):
+                    shutil.rmtree(file_path, ignore_errors=True)
+                    post_info += "{} Removed.".format(file_path) + "\n\n"
+        log_visualize(post_info)
+        logging.shutdown()
+        time.sleep(1)
+        shutil.move(self.log_filepath,
+                    os.path.join(root + "/WareHouse", "_".join([self.project_name, self.org_name, self.start_time]),
+                                 os.path.basename(self.log_filepath)))
+    def self_task_improve(self, task_prompt):
+        """
+        ask agent to improve the user query prompt
+        Args:
+            task_prompt: original user query prompt
+        Returns:
+            revised_task_prompt: revised prompt from the prompt engineer agent
+        """
+        self_task_improve_prompt = """I will give you a short description of a software design requirement, 
+please rewrite it into a detailed prompt that can make large language model know how to make this software better based this prompt,
+the prompt should ensure LLMs build a software that can be run correctly, which is the most import part you need to consider.
+remember that the revised prompt should not contain more than 200 words, 
+here is the short description:\"{}\". 
+If the revised prompt is revised_version_of_the_description, 
+then you should return a message in a format like \"<INFO> revised_version_of_the_description\", do not return messages in other formats.""".format(
+            task_prompt)
+        role_play_session = RolePlaying(
+            assistant_role_name="Prompt Engineer",
+            assistant_role_prompt="You are an professional prompt engineer that can improve user input prompt to make LLM better understand these prompts.",
+            user_role_prompt="You are an user that want to use LLM to build software.",
+            user_role_name="User",
+            task_type=TaskType.CHATDEV,
+            task_prompt="Do prompt engineering on user query",
+            with_task_specify=False,
+            model_type=self.model_type,
+        )
+        _, input_user_msg = role_play_session.init_chat(None, None, self_task_improve_prompt)
+        assistant_response, user_response = role_play_session.step(input_user_msg, True)
+        revised_task_prompt = assistant_response.msg.content.split("<INFO>")[-1].lower().strip()
+        log_visualize(role_play_session.assistant_agent.role_name, assistant_response.msg.content)
+        log_visualize(
+            "**[Task Prompt Self Improvement]**\n**Original Task Prompt**: {}\n**Improved Task Prompt**: {}".format(
+                task_prompt, revised_task_prompt))
+        return revised_task_prompt
+
+
+/home/brandon/Projects/ChatDev/chatdev/documents.py
+
+import re
+import os
+import time
+from colorama import Fore
+class Documents():
+    def __init__(self, generated_content = "", parse = True, predifined_filename = None):
+        self.directory: str = None
+        self.generated_content = generated_content
+        self.docbooks = {}
+        if generated_content != "":
+            if parse:
+                regex = r"```\n(.*?)```"
+                matches = re.finditer(regex, self.generated_content, re.DOTALL)
+                for match in matches:
+                    filename = "requirements.txt"
+                    doc = match.group(1)
+                    self.docbooks[filename] = doc
+            else:
+                self.docbooks[predifined_filename] = self.generated_content
+    def _update_docs(self, generated_content, parse = True, predifined_filename = ""):
+        new_docs = Documents(generated_content, parse, predifined_filename)
+        for key in new_docs.docbooks.keys():
+            if key not in self.docbooks.keys() or self.docbooks[key] != new_docs.docbooks[key]:
+                print("{} updated.".format(key))
+                print(Fore.WHITE + "------Old:\n{}\n------New:\n{}".format(self.docbooks[key] if key in self.docbooks.keys() else "# None", new_docs.docbooks[key]))
+                self.docbooks[key] = new_docs.docbooks[key]
+    def _rewrite_docs(self):
+        directory = self.directory
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+            print("{} Created.".format(directory))
+        for filename in self.docbooks.keys():
+            with open(os.path.join(directory, filename), "w", encoding="utf-8") as writer:
+                writer.write(self.docbooks[filename])
+                print(os.path.join(directory, filename), "Writen")
+    def _get_docs(self):
+        content = ""
+        for filename in self.docbooks.keys():
+            content += "{}\n```\n{}\n```\n\n".format(filename, self.docbooks[filename])
+        return content
+
+
+/home/brandon/Projects/ChatDev/chatdev/roster.py
+
+class Roster():
+    def __init__(self) -> None:
+        self.agents = list()
+    def _recruit(self, agent_name: str):
+        self.agents.append(agent_name)
+    def _exist_employee(self, agent_name: str):
+        names = self.agents + [agent_name]
+        names = [name.lower().strip() for name in names]
+        names = [name.replace(" ", "").replace("_", "") for name in names]
+        agent_name = names[-1]
+        if agent_name in names[:-1]:
+            return True
+        return False
+    def _print_employees(self):
+        names = self.agents
+        names = [name.lower().strip() for name in names]
+        print("Employees: {}".format(names))
+
+
+/home/brandon/Projects/ChatDev/chatdev/codes.py
+
+import difflib
+import os
+import re
+import subprocess
+from chatdev.utils import log_visualize
+class Codes:
+    def __init__(self, generated_content=""):
+        self.directory: str = None
+        self.version: float = 0.0
+        self.generated_content: str = generated_content
+        self.codebooks = {}
+        def extract_filename_from_line(lines):
+            file_name = ""
+            for candidate in re.finditer(r"(\w+\.\w+)", lines, re.DOTALL):
+                file_name = candidate.group()
+                file_name = file_name.lower()
+            return file_name
+        def extract_filename_from_code(code):
+            file_name = ""
+            regex_extract = r"class (\S+?):\n"
+            matches_extract = re.finditer(regex_extract, code, re.DOTALL)
+            for match_extract in matches_extract:
+                file_name = match_extract.group(1)
+            file_name = file_name.lower().split("(")[0] + ".py"
+            return file_name
+        if generated_content != "":
+            regex = r"(.+?)\n```.*?\n(.*?)```"
+            matches = re.finditer(regex, self.generated_content, re.DOTALL)
+            for match in matches:
+                code = match.group(2)
+                if "CODE" in code:
+                    continue
+                group1 = match.group(1)
+                filename = extract_filename_from_line(group1)
+                if "__main__" in code:
+                    filename = "main.py"
+                if filename == "":                      filename = extract_filename_from_code(code)
+                assert filename != ""
+                if filename is not None and code is not None and len(filename) > 0 and len(code) > 0:
+                    self.codebooks[filename] = self._format_code(code)
+    def _format_code(self, code):
+        code = "\n".join([line for line in code.split("\n") if len(line.strip()) > 0])
+        return code
+    def _update_codes(self, generated_content):
+        new_codes = Codes(generated_content)
+        differ = difflib.Differ()
+        for key in new_codes.codebooks.keys():
+            if key not in self.codebooks.keys() or self.codebooks[key] != new_codes.codebooks[key]:
+                update_codes_content = "**[Update Codes]**\n\n"
+                update_codes_content += "{} updated.\n".format(key)
+                old_codes_content = self.codebooks[key] if key in self.codebooks.keys() else "# None"
+                new_codes_content = new_codes.codebooks[key]
+                lines_old = old_codes_content.splitlines()
+                lines_new = new_codes_content.splitlines()
+                unified_diff = difflib.unified_diff(lines_old, lines_new, lineterm='', fromfile='Old', tofile='New')
+                unified_diff = '\n'.join(unified_diff)
+                update_codes_content = update_codes_content + "\n\n" + """```
+'''
+'''\n""" + unified_diff + "\n```"
+                log_visualize(update_codes_content)
+                self.codebooks[key] = new_codes.codebooks[key]
+    def _rewrite_codes(self, git_management, phase_info=None) -> None:
+        directory = self.directory
+        rewrite_codes_content = "**[Rewrite Codes]**\n\n"
+        if os.path.exists(directory) and len(os.listdir(directory)) > 0:
+            self.version += 1.0
+        if not os.path.exists(directory):
+            os.mkdir(self.directory)
+            rewrite_codes_content += "{} Created\n".format(directory)
+        for filename in self.codebooks.keys():
+            filepath = os.path.join(directory, filename)
+            with open(filepath, "w", encoding="utf-8") as writer:
+                writer.write(self.codebooks[filename])
+                rewrite_codes_content += os.path.join(directory, filename) + " Wrote\n"
+        if git_management:
+            if not phase_info:
+                phase_info = ""
+            log_git_info = "**[Git Information]**\n\n"
+            if self.version == 1.0:
+                os.system("cd {}; git init".format(self.directory))
+                log_git_info += "cd {}; git init\n".format(self.directory)
+            os.system("cd {}; git add .".format(self.directory))
+            log_git_info += "cd {}; git add .\n".format(self.directory)
+            completed_process = subprocess.run("cd {}; git status".format(self.directory), shell=True, text=True,
+                                               stdout=subprocess.PIPE)
+            if "nothing to commit" in completed_process.stdout:
+                self.version -= 1.0
+                return
+            os.system("cd {}; git commit -m \"v{}\"".format(self.directory, str(self.version) + " " + phase_info))
+            log_git_info += "cd {}; git commit -m \"v{}\"\n".format(self.directory,
+                                                                      str(self.version) + " " + phase_info)
+            if self.version == 1.0:
+                os.system("cd {}; git submodule add ./{} {}".format(os.path.dirname(os.path.dirname(self.directory)),
+                                                                    "WareHouse/" + os.path.basename(self.directory),
+                                                                    "WareHouse/" + os.path.basename(self.directory)))
+                log_git_info += "cd {}; git submodule add ./{} {}\n".format(
+                    os.path.dirname(os.path.dirname(self.directory)),
+                    "WareHouse/" + os.path.basename(self.directory),
+                    "WareHouse/" + os.path.basename(self.directory))
+                log_visualize(rewrite_codes_content)
+            log_visualize(log_git_info)
+    def _get_codes(self) -> str:
+        content = ""
+        for filename in self.codebooks.keys():
+            content += "{}\n```{}\n{}\n```\n\n".format(filename,
+                                                       "python" if filename.endswith(".py") else filename.split(".")[
+                                                           -1], self.codebooks[filename])
+        return content
+    def _load_from_hardware(self, directory) -> None:
+        assert len([filename for filename in os.listdir(directory) if filename.endswith(".py")]) > 0
+        for root, directories, filenames in os.walk(directory):
+            for filename in filenames:
+                if filename.endswith(".py"):
+                    code = open(os.path.join(directory, filename), "r", encoding="utf-8").read()
+                    self.codebooks[filename] = self._format_code(code)
+        log_visualize("{} files read from {}".format(len(self.codebooks.keys()), directory))

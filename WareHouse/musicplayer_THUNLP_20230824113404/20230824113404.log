@@ -22,7 +22,7 @@ ChatEnvConfig.brainstorming: False
 
 
 **ChatGPTConfig**:
- ChatGPTConfig(temperature=0.2, top_p=1.0, n=1, stream=False, stop=None, max_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
+ ChatGPTConfig(temperature=1, top_p=1.0, n=1, stream=False, stop=None, max_completion_tokens=None, presence_penalty=0.0, frequency_penalty=0.0, logit_bias={}, user='')
 
 
 
@@ -4782,7 +4782,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:50:26 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1634
-max_tokens: 14366
+max_completion_tokens: 14366
 
 
 
@@ -4804,7 +4804,7 @@ total_tokens: 3170
 
 [2023-24-08 11:51:44 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3160
-max_tokens: 12840
+max_completion_tokens: 12840
 
 
 
@@ -6005,7 +6005,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:53:55 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1782
-max_tokens: 14218
+max_completion_tokens: 14218
 
 
 
@@ -6027,7 +6027,7 @@ total_tokens: 2861
 
 [2023-24-08 11:54:50 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 2851
-max_tokens: 13149
+max_completion_tokens: 13149
 
 
 
@@ -6993,7 +6993,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:57:41 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1782
-max_tokens: 14218
+max_completion_tokens: 14218
 
 
 
@@ -7015,7 +7015,7 @@ total_tokens: 1897
 
 [2023-24-08 11:57:47 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1887
-max_tokens: 14113
+max_completion_tokens: 14113
 
 
 
@@ -7757,7 +7757,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 11:59:51 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1782
-max_tokens: 14218
+max_completion_tokens: 14218
 
 
 
@@ -7779,7 +7779,7 @@ total_tokens: 3301
 
 [2023-24-08 12:01:07 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3291
-max_tokens: 12709
+max_completion_tokens: 12709
 
 
 
@@ -9011,7 +9011,7 @@ According to my test reports, please locate and summarize the bugs that cause th
 
 [2023-24-08 12:04:12 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 1781
-max_tokens: 14219
+max_completion_tokens: 14219
 
 
 
@@ -9033,7 +9033,7 @@ total_tokens: 3328
 
 [2023-24-08 12:05:24 INFO] **[OpenAI_Usage_Info Send]**
 num_tokens: 3318
-max_tokens: 12682
+max_completion_tokens: 12682
 
 
 

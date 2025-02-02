@@ -35,7 +35,7 @@ class SystemMessage(BaseMessage):
     role_name: str
     role_type: RoleType
     meta_dict: Optional[Dict[str, str]] = None
-    role: str = "system"
+    role: str = "assistant"
     content: str = ""
 
 
@@ -57,7 +57,7 @@ class AssistantSystemMessage(SystemMessage):
     role_name: str
     role_type: RoleType = RoleType.ASSISTANT
     meta_dict: Optional[Dict[str, str]] = None
-    role: str = "system"
+    role: str = "assistant"
     content: str = ""
 
 
@@ -77,5 +77,5 @@ class UserSystemMessage(SystemMessage):
     role_name: str
     role_type: RoleType = RoleType.USER
     meta_dict: Optional[Dict[str, str]] = None
-    role: str = "system"
+    role: str = "assistant"
     content: str = ""
